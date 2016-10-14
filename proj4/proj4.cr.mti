@@ -1,0 +1,43 @@
+C:/Users/Neeks/Dropbox/EE460M/proj4/clk_div_sevenSeg.v {1 {vlog -work work -stats=none C:/Users/Neeks/Dropbox/EE460M/proj4/clk_div_sevenSeg.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module clk_div_sevenSeg
+
+Top level modules:
+	clk_div_sevenSeg
+
+} {} {}} C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr99.v {1 {vlog -work work -stats=none C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr99.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module bcd_ctr99
+
+Top level modules:
+	bcd_ctr99
+
+} {} {}} C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg4.v {1 {vlog -work work -stats=none C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg4.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module proj4_7seg4
+
+Top level modules:
+	proj4_7seg4
+
+} {} {}} C:/Users/Neeks/Dropbox/EE460M/proj4/sevenSeg.v {1 {vlog -work work -stats=none C:/Users/Neeks/Dropbox/EE460M/proj4/sevenSeg.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module sevenSeg
+
+Top level modules:
+	sevenSeg
+
+} {} {}} C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr9999.v {1 {vlog -work work -stats=none C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr9999.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module bcd_ctr9999
+
+Top level modules:
+	bcd_ctr9999
+
+} {} {}} C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr.v {1 {vlog -work work -stats=none C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module bcd_ctr
+
+Top level modules:
+	bcd_ctr
+
+} {} {}}

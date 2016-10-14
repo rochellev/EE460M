@@ -1,0 +1,7 @@
+module bin2bcd(bin, bcd);
+	input bin;
+	reg[15:0] bin;
+
+	output bcd;
+	reg[15:0] bcd;
+endmodule

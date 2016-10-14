@@ -1,0 +1,2 @@
+module proj4_7segCtlr(th, h, te, o, segSigs);
+endmodule

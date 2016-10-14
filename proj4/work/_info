@@ -1,0 +1,180 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Modeltech_pe_edu_10.4a/examples
+vbcd_ctr
+!s110 1476318494
+!i10b 1
+!s100 =c4MKl`mRY27V[DKei2Z<2
+I:0jeO>]0Ob<oDImiG36<f0
+Z0 VDg1SIo80bB@j0V0VzS_@n1
+Z1 dC:/Users/Neeks/Dropbox/EE460M/proj4
+w1476158205
+8C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr.v
+L0 1
+Z2 OP;L;10.4a;61
+r1
+!s85 0
+31
+!s108 1476318493.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr.v|
+!s101 -O0
+!i113 1
+Z3 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+vbcd_ctr99
+!s110 1476318498
+!i10b 1
+!s100 2N]I:U6I5n9:>???MB<n31
+IPKo><]=Jf9c<Ba<hA?Ff=3
+R0
+R1
+w1474755166
+8C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr99.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr99.v
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1476318498.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr99.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr99.v|
+!s101 -O0
+!i113 1
+R3
+vbcd_ctr9999
+!s110 1476318501
+!i10b 1
+!s100 CnJ>E0:192mSRLH?IKi@43
+INl3mNANmkmLI]R_Lhf34n3
+R0
+R1
+w1476220142
+8C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr9999.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr9999.v
+L0 37
+R2
+r1
+!s85 0
+31
+!s108 1476318501.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr9999.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/bcd_ctr9999.v|
+!s101 -O0
+!i113 1
+R3
+vbin2bcd
+!s110 1476141452
+!i10b 1
+!s100 WKX`cmWSh0?>W0F6C9DFO0
+ISj?I3l7k9z2@67]6icNhQ1
+R0
+R1
+w1476141448
+8C:/Users/Neeks/Dropbox/EE460M/proj4/bin2bcd.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/bin2bcd.v
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1476141452.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/bin2bcd.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/bin2bcd.v|
+!s101 -O0
+!i113 1
+R3
+vclk_div_sevenSeg
+!s110 1476318575
+!i10b 1
+!s100 jXR7koZO8BHLTK^BBR?0:0
+IWE;V8RBnXXSLb_]1hK:P83
+R0
+R1
+w1476314297
+8C:/Users/Neeks/Dropbox/EE460M/proj4/clk_div_sevenSeg.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/clk_div_sevenSeg.v
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1476318575.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/clk_div_sevenSeg.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/clk_div_sevenSeg.v|
+!s101 -O0
+!i113 1
+R3
+nclk_div_seven@seg
+vproj4_7seg
+!s110 1476148161
+!i10b 1
+!s100 F:R`Kh9nQ9Sl?2=^eg@dm3
+IbcQA7C=@E=UdWU1;_@RDJ0
+R0
+R1
+w1476148115
+8C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg.v
+L0 36
+R2
+r1
+!s85 0
+31
+!s108 1476148161.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg.v|
+!s101 -O0
+!i113 1
+R3
+vproj4_7seg4
+!s110 1476321220
+!i10b 1
+!s100 8NTVn<8>AOKjN9HSoCWgf3
+IgE:X>>ENUYamTj:S3QA312
+R0
+R1
+w1476321162
+8C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg4.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg4.v
+L0 38
+R2
+r1
+!s85 0
+31
+!s108 1476321220.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg4.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/proj4_7seg4.v|
+!s101 -O0
+!i113 1
+R3
+vsevenSeg
+!s110 1476319783
+!i10b 1
+!s100 e>cf1O@FMA^ke^aeYPVDN0
+I=J@lEYVMUaRF9h1K4cL:O0
+R0
+R1
+w1476319673
+8C:/Users/Neeks/Dropbox/EE460M/proj4/sevenSeg.v
+FC:/Users/Neeks/Dropbox/EE460M/proj4/sevenSeg.v
+L0 43
+R2
+r1
+!s85 0
+31
+!s108 1476319783.000000
+!s107 C:/Users/Neeks/Dropbox/EE460M/proj4/sevenSeg.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Neeks/Dropbox/EE460M/proj4/sevenSeg.v|
+!s101 -O0
+!i113 1
+R3
+nseven@seg

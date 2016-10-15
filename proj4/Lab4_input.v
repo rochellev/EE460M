@@ -9,11 +9,14 @@ btn_out: output, the debounced value of button in
 module debouncer(clk, btn_in, btn_out);
 input clk;
 input btn_in;
-output reg btn_out;
-reg btn_i; //intermediate btn out
+output btn_out;
+wire btn_outi; //intermediate btn out
+
 //module d_ff(clk, d, q);
-d_ff d1(clk, btn_in, btn_i);
-d_ff d2(clk, btn_i, btn_out); //need assign??
+d_ff d1(clk, btn_in, btn_outi);
+
+d_ff d2(clk, btn_outi, btn_out); 
+
 endmodule 
 
 /* 
@@ -30,21 +33,29 @@ q <= d;
 end
 endmodule
 
+
 /*
 uses debouncer to make sure one press == one change
 btn_in= input from board
 btn_sync = result from debounced input, intermediate output
 pulse = single result from pressing a button
+delay = pulse delay, 
 */
-module sigle_pulse(clk, btn_in, pulse);
-input clk, btn_in;
-output pulse;
-reg btn_sync;
-reg s;
-//module debouncer(clk, btn_in, btn_out);
+module sigle_pulse(clk, btn_in, delay, pulse);
+input clk, btn_in, delay;
+output reg pulse;
+wire btn_sync;
+wire s;
+initial begin
+pulse = 0;
+end
+
 debouncer db1(clk, btn_in, btn_sync);
-dff dff1(clk, btn_sync, s); 
-assign pulse = (btn_sync) & (!s);
+d_ff dff1(clk, btn_sync, s); 
+always@ (posedge clk) begin
+pulse <= (btn_sync) & (~s);
+end
+
 endmodule 
 
 

@@ -40,13 +40,13 @@
   
 */
 
-module sevenSeg(Ai, n, Di, clk, Ao, s, Do);
-  input Ai, n, Di, clk;
+module sevenSeg(n, Di, s, Do);
+  input n, Di;
   wire[3:0] n;
   
-  output Ao, s, Do;
-  reg Ao, Do;
-  reg[6:0] s;
+  output s, Do;
+  wire Do;
+  wire[6:0] s;
   
   `define ZERO 7'b0000001
   `define ONE 7'b1001111
@@ -73,8 +73,6 @@ module sevenSeg(Ai, n, Di, clk, Ao, s, Do);
     digits[8] = `EIGHT;
     digits[9] = `NINE;
   end
-
-  always@(posedge clk) begin
-    {Ao, s, Do} <= {Ai, digits[n > 1'h9 ? 1'h9: n], Di};
-  end
+  
+  assign {s, Do} = {digits[n > 1'h9 ? 1'h9: n], Di};
 endmodule

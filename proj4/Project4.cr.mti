@@ -1,1 +1,10 @@
+{C:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4/Lab4_input.v} {1 {vlog -work work -stats=none {C:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4/Lab4_input.v}
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module debouncer
+-- Compiling module d_ff
+-- Compiling module sigle_pulse
 
+Top level modules:
+	sigle_pulse
+
+} {} {}}

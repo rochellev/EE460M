@@ -5,15 +5,21 @@
   
   
   This module outputs a number between 0 - 9999,
-  incrementing its current value on the positive clock edge
+  incrementing (or decrementing) its current value on the positive clock edge
   
   INPUTS
     en: active high. Enables the counter to be loaded with a new value.
     
-    ld: active high. Loads D into the counter
+    ld: active high. Loads d into the counter
     
     up: 1 will increment the counter every clock cycle.
     0 will decrement the counter ever clock cycle.
+    
+    [1:0]w: a write signal that determines what "d" represents
+      00: load
+      01: add d
+      10: subtract d
+      11: defaults to load
     
     clr: asynchronous clear. Sets the counter to 0000 and co to 0.
     
@@ -34,12 +40,15 @@
       0 otherwise.
 */
 
-module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
-  input en, ld, up, clr, clk;
-  
-  output d, q, co;
+module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
+  input en, ld, up, w, clr, clk, d;
+  wire [1:0] w;
   wire [15:0] d;
+  reg [15:0] di;
+  
+  output q, co;
   wire [15:0] q;
+  wire [15:0] qi;
   
   wire cols99;
   wire coms99;
@@ -54,11 +63,27 @@ module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
     end
   end
   
+  assign q = qi;  
+  
+  always@(w) begin
+    case(w)
+      2'b01: begin 
+        di <= qi + d;
+      end
+      2'b10: begin 
+        di <= qi - d;
+      end
+      default: begin 
+        di <= d;
+      end
+    endcase
+  end
+  
   //module bcd_ctr99(En, Ld, Up, Clr, Clk, D1, D2, Q1, Q2, Co);
-  bcd_ctr99 ls99(en, ld, up, clr, clk, d[3-:4], d[7-:4], 
-                 q[3-:4], q[7-:4], cols99);
-  bcd_ctr99 ms99(enms99, ld, up, clr, clk, d[11-:4], d[15-:4],
-                 q[11-:4], q[15-:4], coms99);
+  bcd_ctr99 ls99(en, ld, up, clr, clk, di[3-:4], di[7-:4], 
+                 qi[3-:4], qi[7-:4], cols99);
+  bcd_ctr99 ms99(enms99, ld, up, clr, clk, di[11-:4], di[15-:4],
+                 qi[11-:4], qi[15-:4], coms99);
                  
-  assign co = cols99 & coms99;               
+  assign co = cols99 & coms99;
 endmodule

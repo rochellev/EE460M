@@ -26,10 +26,10 @@ endmodule
 /* Example 2 */
 module complexDivider(clk100Mhz, reload, slowClk);
   input clk100Mhz, reload; //fast clock
-  wire[31:0] reload;
+  wire[26:0] reload;
   output reg slowClk; //slow clock
 
-  reg[31:0] counter;
+  reg[26:0] counter;
 
   initial begin
     counter = 0;

@@ -61,7 +61,6 @@ module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
   
   initial begin
     ctr <= 2'b00;
-    bcd <= bcd0;
   end
   
   //decimal points should all be disabled

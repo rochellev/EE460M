@@ -47,30 +47,30 @@ module sevenSeg(n, Di, s, Do);
   output s, Do;
   wire[6:0] s;
   
-  `define ZERO 7'b0000001
-  `define ONE 7'b1001111
-  `define TWO 7'b0010010
-  `define THREE 7'b0000110
-  `define FOUR 7'b1001100
-  `define FIVE 7'b0100100
-  `define SIX 7'b0100000
-  `define SEVEN 7'b0001111
-  `define EIGHT 7'b0000000
-  `define NINE 7'b0000100
+  `define ss_ZERO 7'b0000001
+  `define ss_ONE 7'b1001111
+  `define ss_TWO 7'b0010010
+  `define ss_THREE 7'b0000110
+  `define ss_FOUR 7'b1001100
+  `define ss_FIVE 7'b0100100
+  `define ss_SIX 7'b0100000
+  `define ss_SEVEN 7'b0001111
+  `define ss_EIGHT 7'b0000000
+  `define ss_NINE 7'b0000100
   
   reg[6:0] digits[0:9];
   
   initial begin
-    digits[0] = `ZERO;
-    digits[1] = `ONE;
-    digits[2] = `TWO;
-    digits[3] = `THREE;
-    digits[4] = `FOUR;
-    digits[5] = `FIVE;
-    digits[6] = `SIX;
-    digits[7] = `SEVEN;
-    digits[8] = `EIGHT;
-    digits[9] = `NINE;
+    digits[0] = `ss_ZERO;
+    digits[1] = `ss_ONE;
+    digits[2] = `ss_TWO;
+    digits[3] = `ss_THREE;
+    digits[4] = `ss_FOUR;
+    digits[5] = `ss_FIVE;
+    digits[6] = `ss_SIX;
+    digits[7] = `ss_SEVEN;
+    digits[8] = `ss_EIGHT;
+    digits[9] = `ss_NINE;
   end
   
   assign {s, Do} = {digits[n > 1'h9 ? 1'h9: n], Di};

@@ -37,11 +37,9 @@
 module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
   input en, ld, up, clr, clk, d;
   wire[15:0] d;
-  reg[15:0] di;
   
   output q, co;
   wire[15:0] q;
-  wire[15:0] qi;
   
   wire cols99;
   wire coms99;
@@ -54,15 +52,13 @@ module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
     end else begin 
       enms99 <= 1'b0; 
     end
-  end
-  
-  assign q = qi;  
+  end  
   
   //module bcd_ctr99(En, Ld, Up, Clr, Clk, D1, D2, Q1, Q2, Co);
-  bcd_ctr99 ls99(en, ld, up, clr, clk, di[3-:4], di[7-:4], 
-                 qi[3-:4], qi[7-:4], cols99);
-  bcd_ctr99 ms99(enms99, ld, up, clr, clk, di[11-:4], di[15-:4],
-                 qi[11-:4], qi[15-:4], coms99);
+  bcd_ctr99 ls99(en, ld, up, clr, clk, d[3-:4], d[7-:4], 
+                 q[3-:4], q[7-:4], cols99);
+  bcd_ctr99 ms99(enms99, ld, up, clr, clk, d[11-:4], d[15-:4],
+                 q[11-:4], q[15-:4], coms99);
                  
   assign co = cols99 & coms99;
 endmodule

@@ -42,16 +42,16 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   wire[15:0] q;
   wire Co; //not used
   
-  reg en_7seg4;
+  reg en7Seg;
   wire clk7Seg;
-  complexDivider cd7Seg(fastclk, 1666666, clk7seg); // ~ 1/60-second period
+  complexDivider cd7Seg(fastclk, 1666666, clk7Seg); // ~ 1/60-second period
   output Ao, s, Do;
   wire[3:0] Ao;
   wire[6:0] s;
-  reg[15:0] q7seg;
+  reg[15:0] q7Seg;
   
   initial begin 
-    en_7seg4 <= 1'b0; //NEED TO CHANGE
+    en7Seg <= 1'b0; //NEED TO CHANGE
   end
   
   wire clkDeb;
@@ -61,31 +61,31 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   single_pulse debr(clkDeb, btnr, 10, deb_btnr);
   single_pulse debd(clkDeb, btnd, 10, deb_btnd);
   
-  `define FIVE {1'h0, 1'h0, 1'h0, 1'h5}
-  `define TEN {1'h0, 1'h0, 1'h1, 1'h0}
-  `define ONE_HUNDRED {1'h0, 1'h1, 1'h0, 1'h0}
+  `define top_FIVE {1'h0, 1'h0, 1'h0, 1'h5}
+  `define top_TEN {1'h0, 1'h0, 1'h1, 1'h0}
+  `define top_ONE_HUNDRED {1'h0, 1'h1, 1'h0, 1'h0}
   
-  `define NINE999 {1'h9, 1'h9, 1'h9, 1'h9}
+  `define top_NINE999 {1'h9, 1'h9, 1'h9, 1'h9}
   
   always@(*) begin
     ld <= 1'b0;
-    if(q == `NINE999) begin
-      q7seg <= `NINE999;
+    if(q == `top_NINE999) begin
+      q7Seg <= `top_NINE999;
     end else if(q == 0) begin
-      q7seg <= 0;
+      q7Seg <= 0;
     end else begin
       if(deb_btnu) begin
-        q7seg <= q + (`TEN << 1) + `TEN;
+        q7Seg <= q + (`top_TEN << 1) + `top_TEN;
       end else if(deb_btnl) begin
-        q7seg <= q + `ONE_HUNDRED | `TEN << 1;
+        q7Seg <= q + `top_ONE_HUNDRED | `top_TEN << 1;
       end else if(deb_btnr) begin
-        q7seg <= q + `ONE_HUNDRED | `TEN << 3;
+        q7Seg <= q + `top_ONE_HUNDRED | `top_TEN << 3;
       end else if(deb_btnd) begin
-        q7seg <= q + ((`ONE_HUNDRED << 1) | `ONE_HUNDRED);
+        q7Seg <= q + ((`top_ONE_HUNDRED << 1) | `top_ONE_HUNDRED);
       end else if(sw0) begin
-        q7seg <= `TEN | `FIVE;
+        q7Seg <= `top_TEN | `top_FIVE;
       end else if(sw1) begin
-        q7seg <= `ONE_HUNDRED | (`TEN << 3) | `FIVE;
+        q7Seg <= `top_ONE_HUNDRED | (`top_TEN << 3) | `top_FIVE;
       end else begin
         ld <= 1'b1;
       end
@@ -96,5 +96,5 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   bcd_ctr9999 bc9999(1'b0, ld, 1'b0, 1'b1, clkDec, q7seg, q, Co);
   
   //module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
-  proj4_7seg4 p47s4(en_7seg4, q7seg[3-:4], q7seg[7-:4], q7seg[11-:4], q7seg[15-:4], clk7Seg, Ao, s, Do);
+  proj4_7seg4 p47s4(en7Seg4, q7Seg[3-:4], q7Seg[7-:4], q7Seg[11-:4], q7Seg[15-:4], clk7Seg, Ao, s, Do);
 endmodule

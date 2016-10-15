@@ -36,20 +36,23 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   reg ld;
   //up = 0 (decrementer)
   //w = 0 (always loading data)
-  reg clrDec;
+  //clr = 1 (never clear)
   wire clkDec;
-  complexDivider cdDec(clk, 100000000, clkDec); //1-second period
-  reg[15:0] d; 
+  complexDivider cdDec(fastclk, 100000000, clkDec); //1-second period
   wire[15:0] q;
   wire Co; //not used
   
-  wire en_7seg4;
+  reg en_7seg4;
   wire clk7Seg;
-  complexDivider cd7Seg(clk, 1666666, clkDec); // ~ 1/60-second period
+  complexDivider cd7Seg(fastclk, 1666666, clk7seg); // ~ 1/60-second period
   output Ao, s, Do;
   wire[3:0] Ao;
   wire[6:0] s;
   reg[15:0] q7seg;
+  
+  initial begin 
+    en_7seg4 <= 1'b0; //NEED TO CHANGE
+  end
   
   wire clkDeb;
   complexDivider cdDeb(fastclk, 5500000, clkDeb); //55ms period to avoid button noise
@@ -76,7 +79,7 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
       end else if(deb_btnl) begin
         q7seg <= q + `ONE_HUNDRED | `TEN << 1;
       end else if(deb_btnr) begin
-        d <= `ONE_HUNDRED | `TEN << 3;
+        q7seg <= q + `ONE_HUNDRED | `TEN << 3;
       end else if(deb_btnd) begin
         q7seg <= q + ((`ONE_HUNDRED << 1) | `ONE_HUNDRED);
       end else if(sw0) begin
@@ -90,7 +93,7 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   end
   
   //module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(1'b0, ld, 1'b0, 2'b00, clrDec, clkDec, q7seg, q, Co);
+  bcd_ctr9999 bc9999(1'b0, ld, 1'b0, 1'b1, clkDec, q7seg, q, Co);
   
   //module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
   proj4_7seg4 p47s4(en_7seg4, q7seg[3-:4], q7seg[7-:4], q7seg[11-:4], q7seg[15-:4], clk7Seg, Ao, s, Do);

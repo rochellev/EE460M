@@ -72,25 +72,25 @@ module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
   always@(posedge clk) begin
     ctr <= ctr + 1;
     Cint <= s;
-    if(~En) begin 
+    if(En) begin 
       Aint <= 1'hf;
       bcd <= bcd0;
     end else begin
       case(ctr)
         2'b00: begin
-          Aint <= `FIRST_DIG & En;
+          Aint <= `FIRST_DIG;
           bcd <= bcd0;
         end
         2'b01: begin
-          Aint <= `SECOND_DIG & En;
+          Aint <= `SECOND_DIG;
           bcd <= bcd1;
         end
         2'b10: begin
-          Aint <= `THIRD_DIG & En;
+          Aint <= `THIRD_DIG;
           bcd <= bcd2;
         end
         2'b10: begin
-          Aint <= `FOURTH_DIG & En;
+          Aint <= `FOURTH_DIG;
           bcd <= bcd3;
         end
       endcase  

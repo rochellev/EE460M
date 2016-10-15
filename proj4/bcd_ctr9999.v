@@ -15,12 +15,6 @@
     up: 1 will increment the counter every clock cycle.
     0 will decrement the counter ever clock cycle.
     
-    [1:0]w: a write signal that determines what "d" represents
-      00: load
-      01: add d
-      10: subtract d
-      11: defaults to load
-    
     clr: asynchronous clear. Sets the counter to 0000 and co to 0.
     
     clk: clock input signal
@@ -40,9 +34,8 @@
       0 otherwise.
 */
 
-module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
-  input en, ld, up, w, clr, clk, d;
-  wire[1:0] w;
+module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
+  input en, ld, up, clr, clk, d;
   wire[15:0] d;
   reg[15:0] di;
   
@@ -64,20 +57,6 @@ module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
   end
   
   assign q = qi;  
-  
-  always@(w) begin
-    case(w)
-      2'b01: begin 
-        di <= qi + d;
-      end
-      2'b10: begin 
-        di <= qi - d;
-      end
-      default: begin 
-        di <= d;
-      end
-    endcase
-  end
   
   //module bcd_ctr99(En, Ld, Up, Clr, Clk, D1, D2, Q1, Q2, Co);
   bcd_ctr99 ls99(en, ld, up, clr, clk, di[3-:4], di[7-:4], 

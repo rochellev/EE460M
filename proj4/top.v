@@ -38,15 +38,15 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   //w = 0 (always loading data)
   //clr = 1 (never clear)
   wire clkDec;
-  localparam[26:0] clkDecPeriod = 100000000;
-  complexDivider cdDec(fastclk, clkDecPeriod, clkDec); //1-second period
+  //localparam[26:0] clkDecPeriod = 100000000;
+  clkDecDiv cdDec(fastclk, clkDecPeriod, clkDec); //1-second period
   wire[15:0] q;
   wire Co; //not used
   
   reg en7Seg;
   wire clk7Seg;
-  localparam[26:0] clk7SegPeriod = 1666666;
-  complexDivider cd7Seg(fastclk, clk7SegPeriod, clk7Seg); // ~ 1/60-second period
+  //localparam[26:0] clk7SegPeriod = 1666666;
+  clk7SegDiv cd7Seg(fastclk, clk7SegPeriod, clk7Seg); // ~ 1/60-second period
   output Ao, s, Do;
   wire[3:0] Ao;
   wire[6:0] s;
@@ -58,8 +58,8 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   end
   
   wire clkDeb;
-  localparam[26:0] clkDebPeriod = 5500000;
-  complexDivider cdDeb(fastclk, clkDebPeriod, clkDeb); //55ms period to avoid button noise
+  //localparam[26:0] clkDebPeriod = 5500000;
+  clkDebDiv cdDeb(fastclk, clkDebPeriod, clkDeb); //55ms period to avoid button noise
   single_pulse debu(clkDeb, btnu, 10, deb_btnu);
   single_pulse debl(clkDeb, btnl, 10, deb_btnl);
   single_pulse debr(clkDeb, btnr, 10, deb_btnr);

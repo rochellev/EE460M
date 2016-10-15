@@ -41,26 +41,24 @@ btn_sync = result from debounced input, intermediate output
 pulse = single result from pressing a button
 delay = pulse delay, 
 */
-module single_pulse(clk, btn_in, delay, pulse);
-input clk, btn_in, delay;
-wire[31:0] delay;
-wire clkPulse;
-complexDivider cd(clk, delay, clkPulse);
+module single_pulse(clk, btn_in, pulse);
+  input clk, btn_in;
+  wire clkPulse;
+  clkPulseDiv cd(clk, clkPulse);
 
-output reg pulse;
-wire btn_sync;
-wire s;
+  output reg pulse;
+  wire btn_sync;
+  wire s;
 
-initial begin
-pulse = 0;
-end
+  initial begin
+  pulse = 0;
+  end
 
-debouncer db1(clk, btn_in, btn_sync);
-d_ff dff1(clk, btn_sync, s); 
-always@ (posedge clkPulse) begin
-pulse <= (btn_sync) & (~s);
-end
-
+  debouncer db1(clk, btn_in, btn_sync);
+  d_ff dff1(clk, btn_sync, s); 
+  always@ (posedge clkPulse) begin
+    pulse <= (btn_sync) & (~s);
+  end
 endmodule 
 
 

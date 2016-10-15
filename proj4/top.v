@@ -30,7 +30,7 @@
 
 module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   input btnu, btnl, btnr, btnd, sw0, sw1, fastclk;
-  wire deb_btnu, deb_btnl, deb_btnr, deb_bntd;
+  wire deb_btnu, deb_btnl, deb_btnr, deb_btnd;
  
   //en = 0 (always enabled)
   reg ld;
@@ -98,5 +98,6 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   bcd_ctr9999 bc9999(1'b0, ld, 1'b0, 1'b1, clkDec, q7Seg, q, Co);
   
   //module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
-  proj4_7seg4 p47s4(en7Seg, q7Seg[3-:4], q7Seg[7-:4], q7Seg[11-:4], q7Seg[15-:4], clk7Seg, Ao, s, Do);
+  proj4_7seg4 p47s4(en7Seg, q7Seg[3-:4], q7Seg[7-:4], q7Seg[11-:4], q7Seg[15-:4],
+                    clk7Seg, Ao[3-:4], s[6-:7], Do);
 endmodule

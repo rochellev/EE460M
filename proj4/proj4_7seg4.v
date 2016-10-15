@@ -88,7 +88,7 @@ module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
           Aint <= `THIRD_DIG;
           bcd <= bcd2;
         end
-        2'b10: begin
+        2'b11: begin
           Aint <= `FOURTH_DIG;
           bcd <= bcd3;
         end

@@ -30,7 +30,7 @@
 
 module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   input btnu, btnl, btnr, btnd, sw0, sw1, fastclk;
-  wire deb_btnu, deb_btnl, deb_btnr, deb_bntd;
+  wire deb_btnu, deb_btnl, deb_btnr, deb_btnd;
  
   //en = 0 (always enabled)
   reg ld;
@@ -38,13 +38,15 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   //w = 0 (always loading data)
   //clr = 1 (never clear)
   wire clkDec;
-  complexDivider cdDec(fastclk, 100000000, clkDec); //1-second period
+  localparam[26:0] clkDecPeriod = 100000000;
+  complexDivider cdDec(fastclk, clkDecPeriod, clkDec); //1-second period
   wire[15:0] q;
   wire Co; //not used
   
   reg en7Seg;
   wire clk7Seg;
-  complexDivider cd7Seg(fastclk, 1666666, clk7Seg); // ~ 1/60-second period
+  localparam[26:0] clk7SegPeriod = 1666666;
+  complexDivider cd7Seg(fastclk, clk7SegPeriod, clk7Seg); // ~ 1/60-second period
   output Ao, s, Do;
   wire[3:0] Ao;
   wire[6:0] s;
@@ -52,10 +54,12 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   
   initial begin 
     en7Seg <= 1'b0; //NEED TO CHANGE
+    ld <= 1'b1;
   end
   
   wire clkDeb;
-  complexDivider cdDeb(fastclk, 5500000, clkDeb); //55ms period to avoid button noise
+  localparam[26:0] clkDebPeriod = 5500000;
+  complexDivider cdDeb(fastclk, clkDebPeriod, clkDeb); //55ms period to avoid button noise
   single_pulse debu(clkDeb, btnu, 10, deb_btnu);
   single_pulse debl(clkDeb, btnl, 10, deb_btnl);
   single_pulse debr(clkDeb, btnr, 10, deb_btnr);
@@ -88,6 +92,7 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
         q7Seg <= `top_ONE_HUNDRED | (`top_TEN << 3) | `top_FIVE;
       end else begin
         ld <= 1'b1;
+        q7Seg <= q;
       end
     end
   end
@@ -96,5 +101,6 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   bcd_ctr9999 bc9999(1'b0, ld, 1'b0, 1'b1, clkDec, q7Seg, q, Co);
   
   //module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
-  proj4_7seg4 p47s4(en7Seg, q7Seg[3-:4], q7Seg[7-:4], q7Seg[11-:4], q7Seg[15-:4], clk7Seg, Ao, s, Do);
+  proj4_7seg4 p47s4(en7Seg, q7Seg[3-:4], q7Seg[7-:4], q7Seg[11-:4], q7Seg[15-:4],
+                    clk7Seg, Ao[3-:4], s[6-:7], Do);
 endmodule

@@ -1,19 +1,40 @@
 # Reading C:/Modeltech_pe_edu_10.4a/tcl/vsim/pref.tcl
-# OpenFile C:/Users/Neeks/Dropbox/EE460M/proj4/proj4.mpf
+# OpenFile C:/Users/Neeks/Desktop/EE460M/proj4/proj4.mpf
 # Loading project proj4
-# Compile of proj4_7seg.v failed with 1 errors.
-# Compile of proj4_7seg.v failed with 1 errors.
-# Compile of proj4_7seg.v failed with 5 errors.
-# Compile of proj4_7seg.v failed with 2 errors.
-# Compile of proj4_7seg.v failed with 1 errors.
-# Compile of proj4_7seg.v failed with 4 errors.
-# Compile of proj4_7seg.v failed with 1 errors.
-# Compile of proj4_7seg.v was successful.
-# Error: Acs sdne.
-# 
-#        Unable to replace existing ini file (C:/Users/Neeks/Dropbox/EE460M/proj4/proj4.mpf).  File can not be renamed.
-# Compile of proj4_7seg.v was successful with warnings.
-# Compile of proj4_7seg.v was successful.
-# Error: Acs sdne.
-# 
-#        Unable to replace existing ini file (C:/Users/Neeks/Dropbox/EE460M/proj4/proj4.mpf).  File can not be renamed.
+# 0 compiles, 6 failed with no errors.
+# reading C:/Modeltech_pe_edu_10.4a/win32pe_edu/../modelsim.ini
+# Loading project proj4
+# Compile of top.v failed with 4 errors.
+# Compile of top.v failed with 11 errors.
+# Compile of top.v failed with 1 errors.
+# Compile of top.v failed with 15 errors.
+# Compile of top.v was successful.
+# Compile of top.v was successful.
+# Compile of sevenSeg.v failed with 1 errors.
+# Compile of sevenSeg.v was successful.
+# Compile of proj4_7seg4.v failed with 2 errors.
+# Compile of proj4_7seg4.v failed with 1 errors.
+# Compile of proj4_7seg4.v failed with 10 errors.
+# Compile of proj4_7seg4.v failed with 1 errors.
+# Compile of proj4_7seg4.v failed with 7 errors.
+# Compile of proj4_7seg4.v failed with 2 errors.
+# Compile of proj4_7seg4.v was successful.
+# Compile of proj4_7seg4.v was successful.
+# Compile of clk_div.v failed with 2 errors.
+# Compile of clk_div.v failed with 4 errors.
+# Compile of clk_div.v failed with 1 errors.
+# Compile of clk_div.v was successful.
+# Compile of top.v failed with 1 errors.
+# Compile of top.v was successful.
+# Compile of bcd_ctr9999.v failed with 1 errors.
+# Compile of bcd_ctr9999.v failed with 3 errors.
+# Compile of bcd_ctr9999.v failed with 1 errors.
+# Compile of bcd_ctr9999.v failed with 3 errors.
+# Compile of bcd_ctr9999.v was successful.
+# Compile of bcd_ctr99.v was successful.
+# Compile of bcd_ctr.v was successful.
+# Compile of top.v failed with 1 errors.
+# Compile of top.v failed with 5 errors.
+# Compile of top.v failed with 2 errors.
+# Compile of top.v was successful.
+# Compile of top.v was successful.

@@ -52,6 +52,7 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   
   initial begin 
     en7Seg <= 1'b0; //NEED TO CHANGE
+    ld <= 1'b1;
   end
   
   wire clkDeb;
@@ -88,6 +89,7 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
         q7Seg <= `top_ONE_HUNDRED | (`top_TEN << 3) | `top_FIVE;
       end else begin
         ld <= 1'b1;
+        q7Seg <= q;
       end
     end
   end

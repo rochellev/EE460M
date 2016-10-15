@@ -114,6 +114,48 @@ r1
 !i113 1
 R3
 nclk_div_seven@seg
+vd_ff
+Z4 !s110 1476553329
+!i10b 1
+!s100 <C^PBQFimYejh[[PMNF191
+I2T7XWak@:FB1LARR]DI7h0
+R0
+Z5 dC:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4
+Z6 w1476553295
+Z7 8C:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4/Lab4_input.v
+Z8 FC:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4/Lab4_input.v
+L0 27
+R2
+r1
+!s85 0
+31
+Z9 !s108 1476553329.000000
+Z10 !s107 C:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4/Lab4_input.v|
+Z11 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj4/Lab4_input.v|
+!s101 -O0
+!i113 1
+R3
+vdebouncer
+R4
+!i10b 1
+!s100 XAle8Y10ChhkaKQ^R2RF31
+I=TJnP3z1C?E]hlY?[_kcG3
+R0
+R5
+R6
+R7
+R8
+L0 9
+R2
+r1
+!s85 0
+31
+R9
+R10
+R11
+!s101 -O0
+!i113 1
+R3
 vproj4_7seg
 !s110 1476148161
 !i10b 1
@@ -178,3 +220,24 @@ r1
 !i113 1
 R3
 nseven@seg
+vsigle_pulse
+R4
+!i10b 1
+!s100 FZB8lP?dS9;>6gk3CR:692
+IecJmWZ:`jk70W`da:mGGD2
+R0
+R5
+R6
+R7
+R8
+L0 44
+R2
+r1
+!s85 0
+31
+R9
+R10
+R11
+!s101 -O0
+!i113 1
+R3

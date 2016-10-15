@@ -45,7 +45,6 @@ module sevenSeg(n, Di, s, Do);
   wire[3:0] n;
   
   output s, Do;
-  wire Do;
   wire[6:0] s;
   
   `define ZERO 7'b0000001

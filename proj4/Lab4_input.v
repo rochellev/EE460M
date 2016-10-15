@@ -43,7 +43,7 @@ delay = pulse delay,
 */
 module single_pulse(clk, btn_in, delay, pulse);
 input clk, btn_in, delay;
-wire[9:0] delay;
+wire[31:0] delay;
 wire clkPulse;
 complexDivider cd(clk, delay, clkPulse);
 

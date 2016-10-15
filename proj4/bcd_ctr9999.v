@@ -42,13 +42,13 @@
 
 module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
   input en, ld, up, w, clr, clk, d;
-  wire [1:0] w;
-  wire [15:0] d;
-  reg [15:0] di;
+  wire[1:0] w;
+  wire[15:0] d;
+  reg[15:0] di;
   
   output q, co;
-  wire [15:0] q;
-  wire [15:0] qi;
+  wire[15:0] q;
+  wire[15:0] qi;
   
   wire cols99;
   wire coms99;

@@ -44,8 +44,11 @@ module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
   reg[3:0] bcd;
 
   output Ao, Co, Do;
-  reg Ao, Do;
-  reg[6:0] Co;
+  wire[3:0] Ao;
+  wire[6:0] Co;
+  
+  reg Aint;
+  reg[6:0] Cint;
   
   wire[6:0] s;
   
@@ -63,29 +66,31 @@ module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
   
   //decimal points should all be disabled
   sevenSeg ss(bcd, 1'b1, s, Do);
-
+  
+  assign Ao = Aint;
+  assign Co = Cint;
   always@(posedge clk) begin
     ctr <= ctr + 1;
-    Co <= s;
+    Cint <= s;
     if(~En) begin 
-      Ao <= 1'hf;
+      Aint <= 1'hf;
       bcd <= bcd0;
     end else begin
       case(ctr)
         2'b00: begin
-          Ao <= `FIRST_DIG & En;
+          Aint <= `FIRST_DIG & En;
           bcd <= bcd0;
         end
         2'b01: begin
-          Ao <= `SECOND_DIG & En;
+          Aint <= `SECOND_DIG & En;
           bcd <= bcd1;
         end
         2'b10: begin
-          Ao <= `THIRD_DIG & En;
+          Aint <= `THIRD_DIG & En;
           bcd <= bcd2;
         end
         2'b10: begin
-          Ao <= `FOURTH_DIG & En;
+          Aint <= `FOURTH_DIG & En;
           bcd <= bcd3;
         end
       endcase  

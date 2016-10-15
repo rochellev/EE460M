@@ -1,38 +1,51 @@
 
 /* Lab 4 Input: Nico Cortes and Rochelle Roberts
 Buttons and switches on board are inputs
-The purpose of this module is to debounce: 
-	- one press means one input
-	- holding only causes one increment
-	- checks for release before incrementing
-
+The purpose of this module is to debounce.
 btn_out: output, the debounced value of button in
+ ----> clk has to be slow
 */
-/*module single_Pulse(clk, bnt_U, bnt_L,btn_R, btn_D, sw_0, sw_1, btn_out);
-input clk;
-input [8:0] bnt_U, bnt_L,btn_R, btn_D, sw_0, sw_1;
-output 
 
-
-output 
-
-endmodule 
-*/
 module debouncer(clk, btn_in, btn_out);
 input clk;
 input btn_in;
 output reg btn_out;
-reg [6:0] count; //used for masking the bouncing
-
-always @(posedge clk) 
-begin
-count <= {count[5:0], btn_in};
-if(&count) begin
-btn_out <= 1; //btn was a high
-end else if(~|count) begin
-btn_out <= 0; // btn was low
-end
-
-end
-
+reg btn_i; //intermediate btn out
+//module d_ff(clk, d, q);
+d_ff d1(clk, btn_in, btn_i);
+d_ff d2(clk, btn_i, btn_out); //need assign??
 endmodule 
+
+/* 
+d flip flop to be used for debouncing the buttons 
+d = data in, from button
+q = output  (no reset)
+*/
+module d_ff(clk, d, q);
+input clk, d;
+output reg q;
+
+always @(posedge clk) begin
+q <= d;
+end
+endmodule
+
+/*
+uses debouncer to make sure one press == one change
+btn_in= input from board
+btn_sync = result from debounced input, intermediate output
+pulse = single result from pressing a button
+*/
+module sigle_pulse(clk, btn_in, pulse);
+input clk, btn_in;
+output pulse;
+reg btn_sync;
+reg s;
+//module debouncer(clk, btn_in, btn_out);
+debouncer db1(clk, btn_in, btn_sync);
+dff dff1(clk, btn_sync, s); 
+assign pulse = (btn_sync) & (!s);
+endmodule 
+
+
+

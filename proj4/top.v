@@ -49,21 +49,18 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   output Ao, s, Do;
   wire[3:0] Ao;
   wire[6:0] s;
+  reg[15:0] q7seg;
   
   initial begin
     q <= 1'h0;
   end
   
   wire clkDeb;
-  //debouncer goes here
-  
-  //singlepulser goes here
-  
-  //button logic
-  debouncer debu(btnu, deb_btnu);
-  debouncer debl(btnl, deb_btnl);
-  debouncer debr(btnr, deb_btnr);
-  debouncer debd(btnd, deb_btnd);
+  complexDivider(fastclk, 5500000, clkDeb); //55ms period to avoid button noise
+  single_pulse debu(clkDeb, btnu, 10, deb_btnu);
+  single_pulse debl(clkDeb, btnl, 10, deb_btnl);
+  single_pulse debr(clkDeb, btnr, 10, deb_btnr);
+  single_pulse debd(clkDeb, btnd, 10, deb_btnd);
   
   `define FIVE {1'h0, 1'h0, 1'h0, 1'h5}
   `define TEN {1'h0, 1'h0, 1'h1, 1'h0}
@@ -71,41 +68,38 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
   
   `define NINE999 {1'h9, 1'h9, 1'h9, 1'h9}
   
+  initial begin 
+    w <= 2'b00; //load value into decrementer
+  end
+  
   always@(*) begin
     ld <= 1'b0;
     if(q == `NINE999) begin
-      d <= `NINE999;
-      w <= 2'b00;
+      q7seg <= `NINE999;
     end else if(q == 0) begin
-      d <= 0;
-      w <= 2'b00;
-    end
-    if(deb_btnu) begin
-      d <= (`TEN << 1) + `TEN;
-      w <= 2'b01; //add
-    end else if(deb_btnl) begin
-      d <= `ONE_HUNDRED | `TEN << 1;
-      w <= 2'b01; //add
-    end else if(deb_btnr) begin
-      d <= `ONE_HUNDRED | `TEN << 3;
-      w <= 2'b01; //add
-    end else if(deb_btnd) begin
-      d <= (`ONE_HUNDRED << 1) | `ONE_HUNDRED;
-      w <= 2'b01; //add
-    end else if(sw0) begin
-      d <= `TEN | `FIVE;
-      w <= 2'b00; //load
-    end else if(sw1) begin
-      d <= `ONE_HUNDRED | (`TEN << 3) | `FIVE;
-      w <= 2'b00; //load
+      q7seg <= 0;
     end else begin
-      ld <= 1'b1;
+      if(deb_btnu) begin
+        q7seg <= q + (`TEN << 1) + `TEN;
+      end else if(deb_btnl) begin
+        q7seg <= q + `ONE_HUNDRED | `TEN << 1;
+      end else if(deb_btnr) begin
+        d <= `ONE_HUNDRED | `TEN << 3;
+      end else if(deb_btnd) begin
+        q7seg <= q + ((`ONE_HUNDRED << 1) | `ONE_HUNDRED);
+      end else if(sw0) begin
+        q7seg <= `TEN | `FIVE;
+      end else if(sw1) begin
+        q7seg <= `ONE_HUNDRED | (`TEN << 3) | `FIVE;
+      end else begin
+        ld <= 1'b1;
+      end
     end
   end
   
   //module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(1'b0, ld, 1'b0, clrDec, clkDec, d, q, Co);
+  bcd_ctr9999 bc9999(1'b0, ld, 1'b0, clrDec, clkDec, q7seg, q, Co);
   
   //module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
-  proj4_7seg4 p47s4(en_7seg4, q[3-:4], q[7-:4], q[11-:8], q[15-:12], clk7Seg, Ao, Co, Do);
+  proj4_7seg4 p47s4(en_7seg4, q7seg[3-:4], q7seg[7-:4], q7seg[11-:8], q7seg[15-:12], clk7Seg, Ao, Co, Do);
 endmodule

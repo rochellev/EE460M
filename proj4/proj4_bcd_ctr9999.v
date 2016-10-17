@@ -43,21 +43,16 @@ module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
   
   wire cols99;
   wire coms99;
-  reg enms99;
-
-  always@(en, ld, cols99)
-  begin
-    if(en & (ld | cols99)) begin 
-      enms99 <= 1'b1; 
-    end else begin 
-      enms99 <= 1'b0; 
-    end
-  end  
+  wire enms99;
+  wire clrInternal;
+  
+  assign enms99 = (en & (ld | cols99));
+  assign clrInternal = ((q == 0) && ~(ld || up))? 1'b0: clr;
   
   //module bcd_ctr99(En, Ld, Up, Clr, Clk, D1, D2, Q1, Q2, Co);
-  bcd_ctr99 ls99(en, ld, up, clr, clk, d[3-:4], d[7-:4], 
+  bcd_ctr99 ls99(en, ld, up, clrInternal, clk, d[3-:4], d[7-:4], 
                  q[3-:4], q[7-:4], cols99);
-  bcd_ctr99 ms99(enms99, ld, up, clr, clk, d[11-:4], d[15-:4],
+  bcd_ctr99 ms99(enms99, ld, up, clrInternal, clk, d[11-:4], d[15-:4],
                  q[11-:4], q[15-:4], coms99);
                  
   assign co = cols99 & coms99;

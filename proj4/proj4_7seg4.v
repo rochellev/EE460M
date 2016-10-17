@@ -7,23 +7,18 @@
   This module drives the 4-digit 7-segment display on the Basys board.
   
   INPUTS
-    En: Enables the 7-segment display. Active low.
+    en: Enables the 7-segment display. Active high.
     
+    [all 3:0]bcd0, bcd1, bcd2, bcd3: binary coded decimal digits to be displayed
     
-    [3:0]Ai: Which 7-segment displays will be enabled. Active LOW.
-    
-    [15:0]bcd: a binary-coded, 16-bit number that contains each
-    digit of the 7-segment display.
-    The bit layout is as follows: - 15:12 7seg 3 - 11:8 7seg 2 - 7:4 7seg 1 - 3:0 7seg 0 -
-    
-    clk: clock signal; its frequency sets the refresh rate for the 7-segment displays
+    clk: clock signal; its frequency sets the refresh rate for the 4 7-segment displays
     
   OUTPUTS
-    [3:0]Ao: The enable bit for each 7-segment display. Active LOW.
+    [3:0]anodes: The enable bit for each 7-segment display. Active low.
   
-    [6:0]Co: cathodes for a 7-segment displays. Active low.
+    [6:0]segs: cathodes for a 7-segment displays. Active low.
     
-    [3:0] Do: decimal point for each of the 4 7-segment displays. Active LOW.
+    [3:0] decimalPt: decimal point for each of the 4 7-segment displays. Active low.
     
    - Anode layout for each 7-segment display
     - A -
@@ -38,59 +33,85 @@
   
 */
 
-module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
-  input En, bcd0, bcd1, bcd2, bcd3, clk;
-  wire[3:0] bcd0, bcd1, bcd2, bcd3;
-  reg[3:0] bcd;
+module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
+  input[3:0] bcd0, bcd1, bcd2, bcd3;
+  input clk;
 
-  output Ao, Co, Do;
-  wire[3:0] Ao;
-  wire[6:0] Co;
+  wire[15:0] bcd3210;
+  assign bcd3210 = {bcd0, bcd1, bcd2, bcd3};
   
-  reg Aint;
-  reg[6:0] Cint;
+  output reg[3:0] anodes;
+  output[6:0] segs;
+  output  decimalPt;
   
-  wire[6:0] s;
+  reg en7Seg;
+  wire clk7Seg;
+  localparam[27:0] clk7SegPeriod = 1666;
+  complexDivider clkDiv7Seg(clk, clk7SegPeriod, clk7Seg); //~1/60-second period
   
-  `define FIRST_DIG 1'he
-  `define SECOND_DIG 1'hd
-  `define THIRD_DIG 1'hb
-  `define FOURTH_DIG 1'h7
   
-  reg[1:0] ctr;
+  wire clkBlink;
+  localparam[27:0] clkBlinkPeriod = 50000;
+  complexDivider clkDivBlink(clk, clkBlinkPeriod, clk7Seg); //~1/60-second period
+  
+  reg[1:0] blinkCtr;
+  reg[1:0] anodeCtr;
+  reg[3:0] bcdCur;
+  
+  `define proj4_7seg4_FIRST_DIG 4'he
+  `define proj4_7seg4_SECOND_DIG 4'hd
+  `define proj4_7seg4_THIRD_DIG 4'hb
+  `define proj4_7seg4_FOURTH_DIG 4'h7
   
   initial begin
-    ctr <= 2'b00;
+    en7Seg <= 1;
+    blinkCtr <= 2'b00;
+    anodeCtr <= 2'b00;
   end
   
-  //decimal points should all be disabled
-  sevenSeg ss(bcd, 1'b1, s, Do);
+  localparam di = 1'b1; //decimal points should all be disabled
+  sevenSeg ss(bcdCur, di, segs, decimalPt); 
   
-  assign Ao = Aint;
-  assign Co = Cint;
-  always@(posedge clk) begin
-    ctr <= ctr + 1;
-    Cint <= s;
-    if(En) begin 
-      Aint <= 1'hf;
-      bcd <= bcd0;
+  always@(posedge clkBlink) begin
+    if(bcd3210 < 16'h0181) begin 
+      if(blinkCtr & 1) begin 
+        if(!(bcd0 & 0)) begin 
+          en7Seg <= 0;
+        end else begin
+          en7Seg <= 1;
+        end
+      end else begin 
+        if(!(bcd0 & 0)) begin 
+          en7Seg <= 0;
+        end else begin
+          en7Seg <= 1;
+        end
+      end
+    end
+  end
+  
+  always@(posedge clk7Seg) begin
+    anodeCtr <= anodeCtr + 1;
+    if(~en7Seg) begin 
+      anodes <= 4'hf;
+      bcdCur <= bcd0;
     end else begin
-      case(ctr)
+      case(anodeCtr)
         2'b00: begin
-          Aint <= `FIRST_DIG;
-          bcd <= bcd0;
+          anodes <= `proj4_7seg4_FIRST_DIG;
+          bcdCur <= bcd0;
         end
         2'b01: begin
-          Aint <= `SECOND_DIG;
-          bcd <= bcd1;
+          anodes <= `proj4_7seg4_FIRST_DIG;
+          bcdCur <= bcd1;
         end
         2'b10: begin
-          Aint <= `THIRD_DIG;
-          bcd <= bcd2;
+          anodes <= `proj4_7seg4_FIRST_DIG;
+          bcdCur <= bcd2;
         end
         2'b11: begin
-          Aint <= `FOURTH_DIG;
-          bcd <= bcd3;
+          anodes <= `proj4_7seg4_FIRST_DIG;
+          bcdCur <= bcd3;
         end
       endcase  
     end

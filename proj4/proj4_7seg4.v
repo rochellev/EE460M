@@ -52,12 +52,15 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   
   
   wire clkBlink;
+  wire clkSlowBlink;
   localparam[27:0] clkBlinkPeriod = 50000000;
   complexDivider clkDivBlink(clk, clkBlinkPeriod, clkBlink); //~1/60-second period
   
   reg[1:0] blinkCtr;
   reg[1:0] anodeCtr;
   reg[3:0] bcdCur;
+  
+  assign clkSlowBlink = blinkCtr[1];
   
   `define proj4_7seg4_FIRST_DIG 4'he
   `define proj4_7seg4_SECOND_DIG 4'hd
@@ -74,25 +77,17 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   sevenSeg ss(bcdCur, di, segs, decimalPt); 
   
   always@(posedge clkBlink) begin
-    blinkCtr <= blinkCtr + 2'b01;
-    if(bcd3210 == 16'h0000) begin
-      if(blinkCtr & 2'b01) begin
-        en7Seg <= 1'b1;
-      end else begin
-        en7Seg <= 1'b0;
-      end
-    end else if(bcd3210 < 16'h0181) begin 
-      if((blinkCtr & 2'b00) || (blinkCtr & 2'b10)) begin 
-        if(!(bcd0 & 4'h0)) begin 
-          en7Seg <= 1'b0;
-        end else begin
-          en7Seg <= 1'b1;
-        end
+    blinkCtr <= blinkCtr + 1;
+    if(clkSlowBlink) begin 
+      if(bcd0 % 2) begin
+        en7Seg <= 1;
       end else begin 
-        en7Seg <= 1'b1;
+        en7Seg <= 0;
       end
-    end else begin
-      en7Seg <= 1'b1;
+    end else if(bcd3210 == 0) begin 
+      en7Seg <= en7Seg ^ 1;
+    end else begin 
+      en7Seg <= 1;
     end
   end
   

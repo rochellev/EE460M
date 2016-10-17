@@ -1,6 +1,6 @@
 # module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, q);
 
-<<<<<<< HEAD
+
 force btnu 0 0ns, 1 6ns, 0 23ns
 force btnl 0 0ns, 1 84ns, 0 150ns
 force btnr 0 0ns, 1 195ns, 0 230ns
@@ -24,4 +24,4 @@ force sw0 0 0, 1 500000, 0 1500000
 force sw1 0 0
 
 run 6 ms
->>>>>>> 4fc1d28d470bbe708cefd4cc36dbc3b9a425e5f3
+

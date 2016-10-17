@@ -38,7 +38,8 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   input clk;
 
   wire[15:0] bcd3210;
-  assign bcd3210 = {bcd0, bcd1, bcd2, bcd3};
+  assign bcd3210 = {bcd3, bcd2, bcd1, bcd0};
+  
   
   output reg[3:0] anodes;
   output[6:0] segs;
@@ -51,8 +52,8 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   
   
   wire clkBlink;
-  localparam[27:0] clkBlinkPeriod = 50000;
-  complexDivider clkDivBlink(clk, clkBlinkPeriod, clk7Seg); //~1/60-second period
+  localparam[27:0] clkBlinkPeriod = 25000;
+  complexDivider clkDivBlink(clk, clkBlinkPeriod, clkBlink); //~1/60-second period
   
   reg[1:0] blinkCtr;
   reg[1:0] anodeCtr;
@@ -64,7 +65,7 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   `define proj4_7seg4_FOURTH_DIG 4'h7
   
   initial begin
-    en7Seg <= 1;
+    en7Seg <= 1'b1;
     blinkCtr <= 2'b00;
     anodeCtr <= 2'b00;
   end
@@ -73,26 +74,31 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   sevenSeg ss(bcdCur, di, segs, decimalPt); 
   
   always@(posedge clkBlink) begin
-    if(bcd3210 < 16'h0181) begin 
-      if(blinkCtr & 1) begin 
-        if(!(bcd0 & 0)) begin 
-          en7Seg <= 0;
+    blinkCtr <= blinkCtr + 2'b01;
+    if(bcd3210 == 16'h0000) begin
+      if(blinkCtr & 2'b01) begin
+        en7Seg <= 1'b1;
+      end else begin
+        en7Seg <= 1'b0;
+      end
+    end else if(bcd3210 < 16'h0181) begin 
+      if((blinkCtr & 2'b00) || (blinkCtr & 2'b10)) begin 
+        if(!(bcd0 & 4'h0)) begin 
+          en7Seg <= 1'b0;
         end else begin
-          en7Seg <= 1;
+          en7Seg <= 1'b1;
         end
       end else begin 
-        if(!(bcd0 & 0)) begin 
-          en7Seg <= 0;
-        end else begin
-          en7Seg <= 1;
-        end
+        en7Seg <= 1'b1;
       end
+    end else begin
+      en7Seg <= 1'b1;
     end
   end
   
   always@(posedge clk7Seg) begin
-    anodeCtr <= anodeCtr + 1;
-    if(~en7Seg) begin 
+    anodeCtr <= anodeCtr + 2'b01;
+    if(!en7Seg) begin 
       anodes <= 4'hf;
       bcdCur <= bcd0;
     end else begin
@@ -102,15 +108,15 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
           bcdCur <= bcd0;
         end
         2'b01: begin
-          anodes <= `proj4_7seg4_FIRST_DIG;
+          anodes <= `proj4_7seg4_SECOND_DIG;
           bcdCur <= bcd1;
         end
         2'b10: begin
-          anodes <= `proj4_7seg4_FIRST_DIG;
+          anodes <= `proj4_7seg4_THIRD_DIG;
           bcdCur <= bcd2;
         end
         2'b11: begin
-          anodes <= `proj4_7seg4_FIRST_DIG;
+          anodes <= `proj4_7seg4_FOURTH_DIG;
           bcdCur <= bcd3;
         end
       endcase  

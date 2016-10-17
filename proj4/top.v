@@ -35,7 +35,6 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, anodes, segs, decimalPt);
   output[3:0] anodes;
   output[6:0] segs;
   output decimalPt;
- 
   wire[15:0] qDec;
   wire[3:0] q7Seg0;
   wire[3:0] q7Seg1;

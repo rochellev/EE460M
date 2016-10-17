@@ -7,16 +7,14 @@ btn_out: output, the debounced value of button in
 */
 
 module debouncer(clk, btn_in, btn_out);
-input clk;
-input btn_in;
-output btn_out;
-wire btn_outi; //intermediate btn out
+  input clk;
+  input btn_in;
+  output btn_out;
+  wire btn_outi; //intermediate btn out
 
-//module d_ff(clk, d, q);
-d_ff d1(clk, btn_in, btn_outi);
-
-d_ff d2(clk, btn_outi, btn_out); 
-
+  //module d_ff(clk, d, q);
+  d_ff d1(clk, btn_in, btn_outi);
+  d_ff d2(clk, btn_outi, btn_out); 
 endmodule 
 
 /* 
@@ -25,12 +23,12 @@ d = data in, from button
 q = output  (no reset)
 */
 module d_ff(clk, d, q);
-input clk, d;
-output reg q;
+  input clk, d;
+  output reg q;
 
-always @(posedge clk) begin
-q <= d;
-end
+  always @(posedge clk) begin
+    q <= d;
+  end
 endmodule
 
 
@@ -42,22 +40,19 @@ pulse = single result from pressing a button
 delay = pulse delay, 
 */
 module single_pulse(clk, btn_in, pulse);
-  input clk, btn_in;
-  wire clkPulse;
-  clkPulseDiv cd(clk, clkPulse);
+  input clk;
+  input btn_in;
 
   output reg pulse;
-  wire btn_sync;
   wire s;
-
+  
   initial begin
-  pulse = 0;
+    pulse <= 0;
   end
-
-  debouncer db1(clk, btn_in, btn_sync);
-  d_ff dff1(clk, btn_sync, s); 
-  always@ (posedge clkPulse) begin
-    pulse <= (btn_sync) & (~s);
+  
+  d_ff dff1(clk, btn_in, s); 
+  always@(posedge clk) begin
+    pulse <= btn_in & (~s);
   end
 endmodule 
 

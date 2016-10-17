@@ -1,10 +1,10 @@
 /*  
   
-  7-segment display controller
+  top module for project 4
   Nico Cortes and Rochelle Roberts
   
   
-  This controller sets the 7-segment display based on user input
+  this module processes button presses and simulates adding time to a decrementing timer
   
   INPUTS
     btnu, btnl, btnr, btnd: button inputs from the Basys 3 board.
@@ -28,79 +28,29 @@
     Do: decimal point. Active low.
 */
 
-module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, Ao, s, Do);
+module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, anodes, segs, decimalPt);
   input btnu, btnl, btnr, btnd, sw0, sw1, fastclk;
-  wire deb_btnu, deb_btnl, deb_btnr, deb_btnd;
+  wire pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd;
  
-  //en = 0 (always enabled)
-  reg ld;
-  //up = 0 (decrementer)
-  //w = 0 (always loading data)
-  //clr = 1 (never clear)
-  wire clkDec;
-  //localparam[26:0] clkDecPeriod = 100000000;
-  clkDecDiv cdDec(fastclk, clkDec); //1-second period
-  wire[15:0] q;
-  wire Co; //not used
+  output[3:0] anodes;
+  output[6:0] segs;
+  output decimalPt;
+ 
+  wire[15:0] qDec;
+  wire[3:0] q7Seg0;
+  wire[3:0] q7Seg1;
+  wire[3:0] q7Seg2;
+  wire[3:0] q7Seg3;
   
-  reg en7Seg;
-  wire clk7Seg;
-  //localparam[26:0] clk7SegPeriod = 1666666;
-  clk7SegDiv cd7Seg(fastclk, clk7Seg); // ~ 1/60-second period
-  output Ao, s, Do;
-  wire[3:0] Ao;
-  wire[6:0] s;
-  reg[15:0] q7Seg;
+  assign {q7Seg3, q7Seg2, q7Seg1, q7Seg0} = qDec;
+ 
+  //module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, bcdIn, bcdOut, ld);
+  proj4_btnCtlr p4bc(btnu, btnl, btnr, btnd, fastclk, 
+                     pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd);
+
+  proj4_counter p4c(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, fastclk, qDec);
   
-  initial begin 
-    en7Seg <= 1'b0; //NEED TO CHANGE
-    ld <= 1'b1;
-  end
-  
-  wire clkDeb;
-  //localparam[26:0] clkDebPeriod = 5500000;
-  clkDebDiv cdDeb(fastclk, clkDeb); //55ms period to avoid button noise
-  single_pulse debu(clkDeb, btnu, deb_btnu);
-  single_pulse debl(clkDeb, btnl, deb_btnl);
-  single_pulse debr(clkDeb, btnr, deb_btnr);
-  single_pulse debd(clkDeb, btnd, deb_btnd);
-  
-  `define top_FIVE {1'h0, 1'h0, 1'h0, 1'h5}
-  `define top_TEN {1'h0, 1'h0, 1'h1, 1'h0}
-  `define top_ONE_HUNDRED {1'h0, 1'h1, 1'h0, 1'h0}
-  
-  `define top_NINE999 {1'h9, 1'h9, 1'h9, 1'h9}
-  
-  always@(*) begin
-    ld <= 1'b0;
-    if(q == `top_NINE999) begin
-      q7Seg <= `top_NINE999;
-    end else if(q == 0) begin
-      q7Seg <= 0;
-    end else begin
-      if(deb_btnu) begin
-        q7Seg <= q + (`top_TEN << 1) + `top_TEN;
-      end else if(deb_btnl) begin
-        q7Seg <= q + `top_ONE_HUNDRED | `top_TEN << 1;
-      end else if(deb_btnr) begin
-        q7Seg <= q + `top_ONE_HUNDRED | `top_TEN << 3;
-      end else if(deb_btnd) begin
-        q7Seg <= q + ((`top_ONE_HUNDRED << 1) | `top_ONE_HUNDRED);
-      end else if(sw0) begin
-        q7Seg <= `top_TEN | `top_FIVE;
-      end else if(sw1) begin
-        q7Seg <= `top_ONE_HUNDRED | (`top_TEN << 3) | `top_FIVE;
-      end else begin
-        ld <= 1'b1;
-        q7Seg <= q;
-      end
-    end
-  end
-  
-  //module bcd_ctr9999(en, ld, up, w, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(1'b0, ld, 1'b0, 1'b1, clkDec, q7Seg, q, Co);
-  
-  //module proj4_7seg4(En, bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
-  proj4_7seg4 p47s4(en7Seg, q7Seg[3-:4], q7Seg[7-:4], q7Seg[11-:4], q7Seg[15-:4],
-                    clk7Seg, Ao[3-:4], s[6-:7], Do);
+  //module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, Ao, Co, Do);
+  proj4_7seg4 p47s4(q7Seg0, q7Seg1, q7Seg2, q7Seg3,
+                    fastclk, anodes, segs, decimalPt);
 endmodule

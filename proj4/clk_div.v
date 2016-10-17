@@ -24,11 +24,13 @@ endmodule
 ///////////////////////////////////////////////////////////////////////////////
 
 /* Example 2 */
-module clkDecDiv(clk100Mhz, slowClk);
+module complexDivider(clk100Mhz, timeDelay, slowClk);
   input clk100Mhz; //fast clock
+  input[27:0] timeDelay;
+  
   output reg slowClk; //slow clock
 
-  reg[26:0] counter;
+  reg[27:0] counter;
 
   initial begin
     counter = 0;
@@ -37,7 +39,7 @@ module clkDecDiv(clk100Mhz, slowClk);
 
   always @ (posedge clk100Mhz)
   begin
-    if(counter == 100000000) begin
+    if(counter == timeDelay) begin
       counter <= 1;
       slowClk <= ~slowClk;
     end
@@ -45,74 +47,5 @@ module clkDecDiv(clk100Mhz, slowClk);
       counter <= counter + 1;
     end
   end
+
 endmodule
-
-module clk7SegDiv(clk100Mhz, slowClk);
-  input clk100Mhz; //fast clock
-  output reg slowClk; //slow clock
-
-  reg[26:0] counter;
-
-  initial begin
-    counter = 0;
-    slowClk = 0;
-  end
-
-  always @ (posedge clk100Mhz)
-  begin
-    if(counter == 1666666) begin
-      counter <= 1;
-      slowClk <= ~slowClk;
-    end
-    else begin
-      counter <= counter + 1;
-    end
-  end
-endmodule
-
-module clkDebDiv(clk100Mhz, slowClk);
-  input clk100Mhz; //fast clock
-  output reg slowClk; //slow clock
-
-  reg[26:0] counter;
-
-  initial begin
-    counter = 0;
-    slowClk = 0;
-  end
-
-  always @ (posedge clk100Mhz)
-  begin
-    if(counter == 5500000) begin
-      counter <= 1;
-      slowClk <= ~slowClk;
-    end
-    else begin
-      counter <= counter + 1;
-    end
-  end
-endmodule
-
-module clkPulseDiv(clk100Mhz, slowClk);
-  input clk100Mhz; //fast clock
-  output reg slowClk; //slow clock
-
-  reg[26:0] counter;
-
-  initial begin
-    counter = 0;
-    slowClk = 0;
-  end
-
-  always @ (posedge clk100Mhz)
-  begin
-    if(counter == 10) begin
-      counter <= 1;
-      slowClk <= ~slowClk;
-    end
-    else begin
-      counter <= counter + 1;
-    end
-  end
-endmodule
-

@@ -17,7 +17,7 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   localparam upDec = 1'b0;
   reg clrDec;
   wire clkDec;
-  localparam[27:0] clkDecPeriod = 100000;
+  localparam[27:0] clkDecPeriod = 100000000;
   complexDivider clkDivDec(clk, clkDecPeriod, clkDec); //1-second period
   wire carryOut; //not used
   

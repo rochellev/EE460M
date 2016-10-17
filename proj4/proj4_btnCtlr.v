@@ -36,7 +36,7 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, clk,
   wire deb_btnu, deb_btnl, deb_btnr, deb_btnd;
   
   wire debClk;
-  localparam[27:0] debClkPeriod = 5500;
+  localparam[27:0] debClkPeriod = 5500000;
   complexDivider debClkDiv(clk, debClkPeriod, debClk);
   debouncer debu(debClk, btnu, deb_btnu);
   debouncer debl(debClk, btnl, deb_btnl);
@@ -44,7 +44,7 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, clk,
   debouncer debd(debClk, btnd, deb_btnd);
   
   wire s_pClk;
-  localparam[27:0] s_pClkPeriod = 100000;
+  localparam[27:0] s_pClkPeriod = 100000000;
   complexDivider s_pClkDiv(clk, s_pClkPeriod, s_pClk);
   single_pulse s_pu(s_pClk, deb_btnu, pulse_btnu);
   single_pulse s_pl(s_pClk, deb_btnl, pulse_btnl);

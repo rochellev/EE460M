@@ -2,16 +2,18 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   input pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk;
   
   reg[15:0] sum;
+  localparam[15:0] MAX = 9999;
   output[15:0] d;
-  dec2bcd d2b(sum, d);
+  reg[15:0] dSynch;
+  dec2bcd d2b((sum > MAX)? MAX: sum, d);
   
   wire[15:0] q;
   wire[15:0] n;
   bcd2dec b2d(q, n);
   
-  localparam enDec = 1'b1;
+  reg enDec;
   reg ld;
-  wire ldDec;
+  reg ldDec;
   localparam upDec = 1'b0;
   reg clrDec;
   wire clkDec;
@@ -22,10 +24,11 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   initial begin 
     clrDec = 1'b0;
     clrDec <= 1'b1;
+    enDec <= 1;
   end
   
   always@(*) begin
-    if(sw0) begin 
+    if(sw0) begin
       ld <= 1;
       sum <= 15;
     end else if(sw1) begin 
@@ -48,11 +51,14 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
         ld <= 0;
         sum <= n;
       end
-    end
+    end 
   end
   
-  assign ldDec = ld && (sum <= 9999);
+  always@(posedge clkDec) begin 
+    ldDec <= ld;
+    dSynch <= d;
+  end
   
   //module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(enDec, ldDec, upDec, clrDec, clkDec, d, q, carryOut);
+  bcd_ctr9999 bc9999(enDec, ld, upDec, clrDec, clkDec, d, q, carryOut);
 endmodule

@@ -37,34 +37,18 @@
 module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
   input en, ld, up, clr, clk, d;
   wire[15:0] d;
-  reg[15:0] dInternal;
   
   output[15:0] q; 
   output co;
   
-  reg enInternal;
   wire cols99;
   wire coms99;
   wire enms99;
   
-  initial begin 
-    enInternal <= en;
-  end
-  
-  assign enms99 = (enInternal & (ld | cols99));
-  
-  always@(posedge clk) begin 
-    if(q == 0 && co && ~ld && up) begin 
-      enInternal = 1'b0;
-    end else if(q == 16'h9999 && co && ~ld && up) begin 
-      enInternal <= 1'b0;
-    end else begin 
-      enInternal <= en;
-    end
-  end
+  assign enms99 = (en & (ld | cols99));
   
   //module bcd_ctr99(En, Ld, Up, Clr, Clk, D1, D2, Q1, Q2, Co);
-  bcd_ctr99 ls99(enInternal, ld, up, clr, clk, d[3-:4], d[7-:4], 
+  bcd_ctr99 ls99(en, ld, up, clr, clk, d[3-:4], d[7-:4],  
                  q[3-:4], q[7-:4], cols99);
   bcd_ctr99 ms99(enms99, ld, up, clr, clk, d[11-:4], d[15-:4],
                  q[11-:4], q[15-:4], coms99);

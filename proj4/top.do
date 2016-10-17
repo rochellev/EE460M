@@ -10,6 +10,6 @@ force sw1 0 0
 
 force fastclk 0 0ns, 1 5ns -repeat 10 ns 
 
-force sw0 1 250000, 0 500000
+force sw0 1 0, 0 1500000
 
 run 6 ms

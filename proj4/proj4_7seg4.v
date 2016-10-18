@@ -47,7 +47,7 @@ module proj4_7seg4(en7Seg, bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt)
   output  decimalPt;
   
   wire clk7Seg;
-  localparam[27:0] clk7SegPeriod = 166;
+  localparam[27:0] clk7SegPeriod = 166666;
   complexDivider clkDiv7Seg(clk, clk7SegPeriod, clk7Seg); //~1/60-second period
   
   reg[1:0] anodeCtr;

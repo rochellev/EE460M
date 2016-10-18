@@ -1,5 +1,5 @@
-module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, slowClk, d, en7Seg);
-  input pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, slowClk;
+module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, fastclk, clk, slowClk, d, en7Seg);
+  input pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, fastclk, clk, slowClk;
   
   reg[15:0] sum;
   localparam[15:0] MAX = 9999;
@@ -18,20 +18,25 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   
   reg enDec;
   reg ld;
-  reg ldDec;
-  localparam upDec = 1'b0;
-  reg clrDec;
+  localparam upDec = 0;
+  localparam clrDec = 1;
   wire carryOut; //not used
   
-  initial begin 
+  initial begin
     en7SegOdd <= 1;
     en7SegZero <= 1;
-    clrDec = 1'b0;
-    clrDec <= 1'b1;
     enDec <= 1;
   end
   
-  always@(*) begin
+//  localparam[27:0] s_pClkPeriod = 1000;
+//  reg[9:0] s_pCtr = 1;
+  always@(posedge fastclk) begin
+//    ld <= 0;
+//    if(s_pCtr == s_pClkPeriod) begin
+//      s_pCtr <= 1;
+//    end else begin 
+//      s_pCtr <= s_pCtr + 1;
+//    end
     if(sw0) begin
       ld <= 1;
       sum <= 15;
@@ -64,9 +69,8 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   end
   
   always@(posedge slowClk) begin
-    ldDec <= ld;
-    if(d < 16'h0181) begin 
-      if(d & 1) begin 
+    if(d <= 16'h0181) begin 
+      if(!(d & 1)) begin 
         en7SegOdd <= 1;
       end else begin 
         if(d == 0) begin
@@ -89,5 +93,5 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   end
   
   //module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(enDec, ldDec, upDec, clrDec, slowClk, d, q, carryOut);
+  bcd_ctr9999 bc9999(enDec, ld, upDec, clrDec, slowClk, d, q, carryOut);
 endmodule

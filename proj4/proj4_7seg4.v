@@ -59,8 +59,6 @@ module proj4_7seg4(en7Seg, bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt)
   `define proj4_7seg4_FOURTH_DIG 4'h7
   
   initial begin
-    en7Seg <= 1'b1;
-    blinkCtr <= 2'b00;
     anodeCtr <= 2'b00;
   end
   

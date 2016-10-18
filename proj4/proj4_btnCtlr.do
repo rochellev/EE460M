@@ -1,4 +1,4 @@
-# module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, bcdIn, bcdOut, ld);
+# proj4_btnCtlr p4bc(btnu, btnl, btnr, btnd, sw0, sw1, clk, anodes, segs, decimalPt);
 
 restart
 
@@ -9,18 +9,12 @@ add wave btnd
 add wave sw0
 add wave sw1
 add wave clk
-add wave debClk
-add wave s_pClk
-add wave bcdIn
-add wave bcdOut
-add wave ld
+add wave anodes
+add wave segs
+add wave decimalPt
 
 force clk 0 0ns, 1 5ns -repeat 10 ns
 
-force bcdIn 16'h1000
-
-force sw0 1 1000000 ns, 0 1010000 ns
-
-force btnu 1 1100000 ns, 0 1300000 ns
+force sw0 1 1000000 ns, 0 2000000 ns
 
 run 6 ms

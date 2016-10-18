@@ -37,5 +37,5 @@ module top(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, anodes, segs, decimalPt);
   output decimalPt;
  
   //module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, bcdIn, bcdOut, ld);
-  proj4_btnCtlr p4bc(btnu, btnl, btnr, btnd, fastclk, anodes, segs, decimalPt);
+  proj4_btnCtlr p4bc(btnu, btnl, btnr, btnd, sw0, sw1, fastclk, anodes, segs, decimalPt);
 endmodule

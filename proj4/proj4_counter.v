@@ -1,11 +1,15 @@
-module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, d, en7Seg);
-  input pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk;
+module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, slowClk, d, en7Seg);
+  input pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, slowClk;
   
   reg[15:0] sum;
   localparam[15:0] MAX = 9999;
   output[15:0] d;
-  output reg en7Seg;
-  reg[15:0] dSynch;
+  output en7Seg;
+  reg en7SegOdd;
+  reg en7SegZero;
+  
+  assign en7Seg = en7SegOdd && en7SegZero;
+  
   dec2bcd d2b((sum > MAX)? MAX: sum, d);
   
   wire[15:0] q;
@@ -20,7 +24,8 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   wire carryOut; //not used
   
   initial begin 
-    en7Seg <= 1;
+    en7SegOdd <= 1;
+    en7SegZero <= 1;
     clrDec = 1'b0;
     clrDec <= 1'b1;
     enDec <= 1;
@@ -47,7 +52,7 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
         ld <= 1;
         sum <= n + 300;
       end else begin
-        if(q != 0) begin
+        if(d != 0) begin
           ld <= 0;
           sum <= n;
         end else begin 
@@ -58,20 +63,31 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
     end 
   end
   
-  always@(posedge clk) begin 
+  always@(posedge slowClk) begin
     ldDec <= ld;
-    dSynch <= d;
     if(d < 16'h0181) begin 
       if(d & 1) begin 
-        en7Seg <= 1;
+        en7SegOdd <= 1;
       end else begin 
-        en7Seg <= 0;
+        if(d == 0) begin
+          en7SegOdd <= 1;
+        end else begin
+          en7SegOdd <= 0;
+        end
       end
     end else begin 
-      en7Seg <= 1;
+      en7SegOdd <= 1;
+    end
+  end
+  
+  always@(posedge clk) begin
+    if(d == 0) begin 
+      en7SegZero <= en7SegZero ^ 1;
+    end else begin
+      en7SegZero <= 1;
     end
   end
   
   //module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(enDec, ld, upDec, clrDec, clk, d, q, carryOut);
+  bcd_ctr9999 bc9999(enDec, ldDec, upDec, clrDec, slowClk, d, q, carryOut);
 endmodule

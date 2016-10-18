@@ -43,18 +43,9 @@ module single_pulse(clk, btn_in, pulse);
   input clk;
   input btn_in;
 
-  output reg pulse;
+  output pulse;
   wire s;
   
-  initial begin
-    pulse <= 0;
-  end
-  
   d_ff dff1(clk, btn_in, s); 
-  always@(posedge clk) begin
-    pulse <= btn_in & (~s);
-  end
-endmodule 
-
-
-
+  assign pulse = btn_in & (~s);
+endmodule

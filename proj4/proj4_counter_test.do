@@ -1,8 +1,9 @@
-# module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, q);
+# proj4_counter p4c(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, s_pClk, s_pSlowClk, qDec, en7Seg);
 
 restart
 
-force clk 0 0, 1 5 -repeat 10 ns
+force clk 0 0, 1 237500 -repeat 475000 ns
+force slowClk 0 0, 1 475000 -repeat 950000 ns
 
 force pulse_btnu 0 0ns 
 force pulse_btnl 0 0ns

@@ -35,7 +35,7 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, anodes, segs, decima
   output[6:0] segs;
   output decimalPt;
   
-  wire pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd;
+  reg pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, pulse_sw0, pulse_sw1;
   wire deb_btnu, deb_btnl, deb_btnr, deb_btnd;
   
   wire en7Seg;
@@ -48,35 +48,50 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, anodes, segs, decima
   assign {q7Seg3, q7Seg2, q7Seg1, q7Seg0} = qDec;
   
   wire debClk;
-  localparam[27:0] debClkPeriod = 5500000;
+  localparam[27:0] debClkPeriod = 5500;
   complexDivider debClkDiv(clk, debClkPeriod, debClk);
   debouncer debu(debClk, btnu, deb_btnu);
   debouncer debl(debClk, btnl, deb_btnl);
   debouncer debr(debClk, btnr, deb_btnr);
   debouncer debd(debClk, btnd, deb_btnd);
   
+  always@(posedge clk) begin 
+    if(sw0) begin 
+      pulse_sw0 <= 1;
+    end else if(sw1) begin 
+      pulse_sw1 <= 1;
+    end else begin
+      if(deb_btnu) begin 
+        pulse_btnu <= 1;
+      end else if(deb_btnl) begin 
+        pulse_btnl <= 1;
+      end else if(deb_btnr) begin 
+        pulse_btnr <= 1;
+      end else if(deb_btnd) begin 
+        pulse_btnd <= 1;
+      end else begin end
+    end
+  end
+  
   wire s_pClk;
   wire s_pSlowClk;
-  reg[1:0] s_pCtr;
-  localparam[27:0] s_pClkPeriod = 95000000; //45000000 + 2500000
+  localparam[27:0] s_pClkPeriod = 47500; //45000000 + 2500000
+  localparam[27:0] s_pSlowClkPeriod = 1; //45000000 + 2500000
   complexDivider s_pClkDiv(clk, s_pClkPeriod, s_pClk);
-  single_pulse s_pu(s_pClk, deb_btnu, pulse_btnu);
-  single_pulse s_pl(s_pClk, deb_btnl, pulse_btnl);
-  single_pulse s_pr(s_pClk, deb_btnr, pulse_btnr);
-  single_pulse s_pd(s_pClk, deb_btnd, pulse_btnd);
+  complexDivider s_pSlowClkDiv(s_pClk, s_pSlowClkPeriod, s_pSlowClk);
   
-  // initial begin 
-    // s_pCtr <= 0;
-  // end
+  always@(posedge s_pSlowClk) begin 
+    pulse_sw0 <= sw0;
+    pulse_sw1 <= sw1;
+    pulse_btnu <= 0;
+    pulse_btnl <= 0;
+    pulse_btnr <= 0;
+    pulse_btnd <= 0;
+  end
   
-  // always@(posedge s_pClk) begin 
-    // s_pCtr <= s_pCtr + 1;
-  // end
+  proj4_counter p4c(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, 
+                    pulse_sw0, pulse_sw1, s_pClk, s_pSlowClk, qDec, en7Seg);
   
-  // assign s_pSlowClk = s_pCtr[1];
-  
-  proj4_counter p4c(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, s_pClk, qDec, en7Seg);
-  
-   proj4_7seg4 p47s4(en7Seg, q7Seg0, q7Seg1, q7Seg2, q7Seg3,
-                     clk, anodes, segs, decimalPt);
+  proj4_7seg4 p47s4(en7Seg, q7Seg0, q7Seg1, q7Seg2, q7Seg3,
+                    clk, anodes, segs, decimalPt);
 endmodule

@@ -2,19 +2,26 @@
 
 restart
 
-add wave btnu
-add wave btnl
-add wave btnr
-add wave btnd
-add wave sw0
-add wave sw1
-add wave clk
-add wave anodes
-add wave segs
-add wave decimalPt
+force btnu 0 0
+force btnl 0 0
+force btnr 0 0
+force btnd 0 0
+force sw1 0 0
+
+force deb_btnu 0 0
+force deb_btnl 0 0
+force deb_btnr 0 0
+force deb_btnd 0 0
+
+force pulse_btnu 0 0
+force pulse_btnl 0 0
+force pulse_btnr 0 0
+force pulse_btnd 0 0
+force pulse_sw1 0 0
+
 
 force clk 0 0ns, 1 5ns -repeat 10 ns
 
-force sw0 1 1000000 ns, 0 2000000 ns
+force sw0 0 0, 1 1000000 ns, 0 2500000 ns
 
-run 6 ms
+run 8 ms

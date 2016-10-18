@@ -33,7 +33,8 @@
   
 */
 
-module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
+module proj4_7seg4(en7Seg, bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
+  input en7Seg;
   input[3:0] bcd0, bcd1, bcd2, bcd3;
   input clk;
 
@@ -45,22 +46,12 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   output[6:0] segs;
   output  decimalPt;
   
-  reg en7Seg;
   wire clk7Seg;
-  localparam[27:0] clk7SegPeriod = 1666666;
+  localparam[27:0] clk7SegPeriod = 166666;
   complexDivider clkDiv7Seg(clk, clk7SegPeriod, clk7Seg); //~1/60-second period
   
-  
-  wire clkBlink;
-  wire clkSlowBlink;
-  localparam[27:0] clkBlinkPeriod = 50000000;
-  complexDivider clkDivBlink(clk, clkBlinkPeriod, clkBlink); //~1/60-second period
-  
-  reg[1:0] blinkCtr;
   reg[1:0] anodeCtr;
   reg[3:0] bcdCur;
-  
-  assign clkSlowBlink = blinkCtr[1];
   
   `define proj4_7seg4_FIRST_DIG 4'he
   `define proj4_7seg4_SECOND_DIG 4'hd
@@ -75,21 +66,6 @@ module proj4_7seg4(bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);
   
   localparam di = 1'b1; //decimal points should all be disabled
   sevenSeg ss(bcdCur, di, segs, decimalPt); 
-  
-  always@(posedge clkBlink) begin
-    blinkCtr <= blinkCtr + 1;
-    if(clkSlowBlink) begin 
-      if(bcd0 % 2) begin
-        en7Seg <= 1;
-      end else begin 
-        en7Seg <= 0;
-      end
-    end else if(bcd3210 == 0) begin 
-      en7Seg <= en7Seg ^ 1;
-    end else begin 
-      en7Seg <= 1;
-    end
-  end
   
   always@(posedge clk7Seg) begin
     anodeCtr <= anodeCtr + 2'b01;

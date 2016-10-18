@@ -28,12 +28,24 @@
     Do: decimal point. Active low.
 */
 
-module proj4_btnCtlr(btnu, btnl, btnr, btnd, clk, 
-                     pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd);
-  input btnu, btnl, btnr, btnd, clk;
+module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, anodes, segs, decimalPt);
+  input btnu, btnl, btnr, btnd, sw0, sw1, clk;
   
-  output pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd;
+  output[3:0] anodes;
+  output[6:0] segs;
+  output decimalPt;
+  
+  wire pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd;
   wire deb_btnu, deb_btnl, deb_btnr, deb_btnd;
+  
+  reg en7Seg
+  wire[15:0] qDec;
+  wire[3:0] q7Seg0;
+  wire[3:0] q7Seg1;
+  wire[3:0] q7Seg2;
+  wire[3:0] q7Seg3;
+  
+  assign {q7Seg3, q7Seg2, q7Seg1, q7Seg0} = qDec;
   
   wire debClk;
   localparam[27:0] debClkPeriod = 5500000;
@@ -44,10 +56,27 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, clk,
   debouncer debd(debClk, btnd, deb_btnd);
   
   wire s_pClk;
-  localparam[27:0] s_pClkPeriod = 100000000;
+  wire s_pSlowClk;
+  reg[1:0] s_pCtr;
+  localparam[27:0] s_pClkPeriod = 47500000; //45000000 + 2500000
   complexDivider s_pClkDiv(clk, s_pClkPeriod, s_pClk);
   single_pulse s_pu(s_pClk, deb_btnu, pulse_btnu);
   single_pulse s_pl(s_pClk, deb_btnl, pulse_btnl);
   single_pulse s_pr(s_pClk, deb_btnr, pulse_btnr);
   single_pulse s_pd(s_pClk, deb_btnd, pulse_btnd);
+  
+  initial begin 
+    s_pCtr <= 0;
+  end
+  
+  always@(posedge s_pClk) begin 
+    s_pCtr <= s_pCtr + 1
+  end
+  
+  assign s_pSlowClk = s_pCtr[1];
+  
+  proj4_counter p4c(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, s_pClk, qDec, en7Seg);
+  
+   proj4_7seg4 p47s4(en7Seg, q7Seg0, q7Seg1, q7Seg2, q7Seg3,
+                     clk, anodes, segs, decimalPt);
 endmodule

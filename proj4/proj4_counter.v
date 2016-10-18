@@ -1,9 +1,10 @@
-module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, d);
+module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk, d, en7Seg);
   input pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, clk;
   
   reg[15:0] sum;
   localparam[15:0] MAX = 9999;
   output[15:0] d;
+  output reg en7Seg;
   reg[15:0] dSynch;
   dec2bcd d2b((sum > MAX)? MAX: sum, d);
   
@@ -16,12 +17,10 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
   reg ldDec;
   localparam upDec = 1'b0;
   reg clrDec;
-  wire clkDec;
-  localparam[27:0] clkDecPeriod = 100000000;
-  complexDivider clkDivDec(clk, clkDecPeriod, clkDec); //1-second period
   wire carryOut; //not used
   
   initial begin 
+    en7Seg <= 1;
     clrDec = 1'b0;
     clrDec <= 1'b1;
     enDec <= 1;
@@ -48,17 +47,31 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, c
         ld <= 1;
         sum <= n + 300;
       end else begin
-        ld <= 0;
-        sum <= n;
+        if(q != 0) begin
+          ld <= 0;
+          sum <= n;
+        end else begin 
+          ld <= 1;
+          sum <= 0;
+        end
       end
     end 
   end
   
-  always@(posedge clkDec) begin 
+  always@(posedge clk) begin 
     ldDec <= ld;
     dSynch <= d;
+    if(d < 16'h0181) begin 
+      if(d & 1) begin 
+        en7Seg <= 1;
+      end else begin 
+        en7Seg <= 0;
+      end
+    end else begin 
+      en7Seg <= 1;
+    end
   end
   
   //module bcd_ctr9999(en, ld, up, clr, clk, d, q, co);
-  bcd_ctr9999 bc9999(enDec, ld, upDec, clrDec, clkDec, d, q, carryOut);
+  bcd_ctr9999 bc9999(enDec, ld, upDec, clrDec, clk, d, q, carryOut);
 endmodule

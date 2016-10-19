@@ -8,6 +8,12 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, f
   reg en7SegOdd;
   reg en7SegZero;
   
+  wire reset;
+  reg resetSum = 1;
+  reg resetDec = 0;
+  
+  assign reset = resetSum ^ resetDec;
+  
   assign en7Seg = en7SegOdd && en7SegZero;
   
   dec2bcd d2b((sum > MAX)? MAX: sum, d);
@@ -28,15 +34,8 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, f
     enDec <= 1;
   end
   
-//  localparam[27:0] s_pClkPeriod = 1000;
-//  reg[9:0] s_pCtr = 1;
   always@(posedge fastclk) begin
-//    ld <= 0;
-//    if(s_pCtr == s_pClkPeriod) begin
-//      s_pCtr <= 1;
-//    end else begin 
-//      s_pCtr <= s_pCtr + 1;
-//    end
+    ld <= 1;
     if(sw0) begin
       ld <= 1;
       sum <= 15;
@@ -46,20 +45,26 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, f
     end else begin
       if(pulse_btnu) begin 
         ld <= 1;
-        sum <= n + 30;
+        sum <= sum + 30;
       end else if(pulse_btnl) begin 
         ld <= 1;
-        sum <= n + 120;
+        sum <= sum + 120;
       end else if(pulse_btnr) begin 
         ld <= 1;
-        sum <= n + 180;
+        sum <= sum + 180;
       end else if(pulse_btnd) begin 
         ld <= 1;
-        sum <= n + 300;
+        sum <= sum + 300;
       end else begin
         if(d != 0) begin
-          ld <= 0;
-          sum <= n;
+            if(reset) begin 
+              ld <= 0;
+              sum <= n;
+              resetSum <= !resetSum;
+            end else begin
+              ld <= ld;
+              sum <= sum;
+            end
         end else begin 
           ld <= 1;
           sum <= 0;
@@ -69,18 +74,23 @@ module proj4_counter(pulse_btnu, pulse_btnl, pulse_btnr, pulse_btnd, sw0, sw1, f
   end
   
   always@(posedge slowClk) begin
-    if(d <= 16'h0181) begin 
-      if(!(d & 1)) begin 
-        en7SegOdd <= 1;
-      end else begin 
-        if(d == 0) begin
+    resetDec <= !resetDec;
+    if(!(sw0 || sw1)) begin
+        if(d <= 16'h0181) begin 
+          if(!(d & 1)) begin 
+            en7SegOdd <= 1;
+          end else begin 
+            if(d == 0) begin
+              en7SegOdd <= 1;
+            end else begin
+              en7SegOdd <= 0;
+            end
+          end
+        end else begin 
           en7SegOdd <= 1;
-        end else begin
-          en7SegOdd <= 0;
         end
-      end
     end else begin 
-      en7SegOdd <= 1;
+        en7SegOdd <= 1;
     end
   end
   

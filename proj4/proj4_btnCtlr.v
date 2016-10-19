@@ -48,6 +48,8 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, anodes, segs, decima
   assign {q7Seg3, q7Seg2, q7Seg1, q7Seg0} = qDec;
   
   wire debClk;
+  wire fastClk;
+  //wire decCtrlClk;
   wire halfClk;
   wire slowClk;
     
@@ -61,16 +63,18 @@ module proj4_btnCtlr(btnu, btnl, btnr, btnd, sw0, sw1, clk, anodes, segs, decima
 //  wire s_pClk;
 //  localparam[27:0] s_pClkPeriod = 100000;
 //  complexDivider s_pClkDiv(clk, s_pClkPeriod, s_pClk); //~1/60-second period
-  single_pulse s_pu(slowClk, deb_btnu, pulse_btnu);
-  single_pulse s_pl(slowClk, deb_btnl, pulse_btnl);
-  single_pulse s_pr(slowClk, deb_btnr, pulse_btnr);
-  single_pulse s_pd(slowClk, deb_btnd, pulse_btnd);
+  single_pulse s_pu(fastClk, deb_btnu, pulse_btnu);
+  single_pulse s_pl(fastClk, deb_btnl, pulse_btnl);
+  single_pulse s_pr(fastClk, deb_btnr, pulse_btnr);
+  single_pulse s_pd(fastClk, deb_btnd, pulse_btnd);
   
   localparam[27:0] fastClkPeriod = 100000; //45000000 + 2500000
-  localparam[27:0] halfClkPeriod = 47500000; //45000000 + 2500000
+  //localparam[27:0] decCtrlClkPeriod = 1; //45000000 + 2500000
+  localparam[27:0] halfClkPeriod = 45000000; //45000000 + 2500000
   localparam[27:0] slowClkPeriod = 1; //45000000 + 2500000
   
   complexDivider fastClkDiv(clk, fastClkPeriod, fastClk);
+  //complexDivider decCtrlClkDiv(fastClk, fastClkPeriod, fastClk);
   complexDivider halfClkDiv(clk, halfClkPeriod, halfClk);
   complexDivider slowClkDiv(halfClk, slowClkPeriod, slowClk);
   

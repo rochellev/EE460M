@@ -21,11 +21,11 @@
 
 module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
   input pxlClk25Mhz;
-  input[2:0] pxl_color;
-  output reg[7:0] R, G, B;
+  input[7:0] pxl_color;
+  output reg[3:0] R, G, B;
   output reg hSync, vSync;
   
-  wire[7:0] RInternal, GInternal, BInternal; 
+  wire[3:0] RInternal, GInternal, BInternal; 
   
   `define VGA_CTLR_HSYNC_BLANK_START 639
   `define VGA_CTLR_HSYNC_DOWN 659
@@ -33,6 +33,7 @@ module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
   `define VGA_CTLR_HSYNC_MAX 799
   reg[9:0] hSyncCtr;
 
+  `define VGA_CTLR_VSYNC_BLANK_START 479
   `define VGA_CTLR_VSYNC_DOWN 493
   //`define VGA_CTLR_VSYNC_UP 494 - don't need
   `define VGA_CTLR_VSYNC_MAX 524
@@ -48,17 +49,21 @@ module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
   always@(posedge pxlClk25Mhz) begin
     //hSync
     hSyncCtr <= (hSyncCtr == `VGA_CTLR_HSYNC_MAX)? 0: hSyncCtr + 1;
-    hSync <= (hSyncCtr > `VGA_CTLR_HSYNC_DOWN
-              && hSyncCtr < `VGA_CTLR_HSYNC_UP)? 0: 1;
+    hSync <= (hSyncCtr < `VGA_CTLR_HSYNC_DOWN - 1)
+              || (hSyncCtr >= `VGA_CTLR_HSYNC_UP);
     
     //vSync
     if(hSyncCtr == `VGA_CTLR_HSYNC_MAX) begin 
       vSyncCtr <= (vSyncCtr == `VGA_CTLR_VSYNC_MAX)? 0: vSyncCtr + 1;
     end
-    vSync <= (vSyncCtr == `VGA_CTLR_VSYNC_DOWN)? 0: 1;
     
-    //pxlSync
-    {R, G, B} <= (hSyncCtr > `VGA_CTLR_HSYNC_BLANK_START)? {8'h0, 8'h0, 8'h0}
-                  : {RInternal, GInternal, BInternal};
+    vSync <= !(vSyncCtr == `VGA_CTLR_VSYNC_DOWN - 1);
+    
+    //display the color?
+    {R, G, B} <= (((hSyncCtr < `VGA_CTLR_HSYNC_BLANK_START)
+                || (hSyncCtr == `VGA_CTLR_HSYNC_MAX))  
+                && ((vSyncCtr < `VGA_CTLR_VSYNC_BLANK_START)
+                ||(hSyncCtr == `VGA_CTLR_VSYNC_MAX)))? {RInternal, GInternal, BInternal}
+                : {4'h0, 4'h0, 4'h0};      
   end
 endmodule

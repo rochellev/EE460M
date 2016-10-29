@@ -1,4 +1,4 @@
-# module module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
+# module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
 
 restart
 

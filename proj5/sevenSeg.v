@@ -57,8 +57,14 @@ module sevenSeg(n, Di, s, Do);
   `define ss_SEVEN 7'b0001111
   `define ss_EIGHT 7'b0000000
   `define ss_NINE 7'b0000100
+  `define ss_A 7'b0001000
+  `define ss_B 7'b1100000
+  `define ss_C 7'b0110001
+  `define ss_D 7'b1000010
+  `define ss_E 7'b0110000
+  `define ss_F 7'b0111000
   
-  reg[6:0] digits[0:9];
+  reg[6:0] digits[0:15];
   
   initial begin
     digits[0] = `ss_ZERO;
@@ -71,6 +77,12 @@ module sevenSeg(n, Di, s, Do);
     digits[7] = `ss_SEVEN;
     digits[8] = `ss_EIGHT;
     digits[9] = `ss_NINE;
+    digits[10] = `ss_A;
+    digits[11] = `ss_B;
+    digits[12] = `ss_C;
+    digits[13] = `ss_D;
+    digits[14] = `ss_E;
+    digits[15] = `ss_F;
   end
   
   assign {s, Do} = {digits[n > 4'h9 ? 4'h9: n], Di};

@@ -13,8 +13,6 @@ internals ---
 
 */
 
-
-
 module ps2(clk, PS2Clk, PS2Data, key_code, strobe);
 input clk, PS2Clk, PS2Data;
 output reg [7:0] key_code; 
@@ -22,44 +20,52 @@ output reg strobe;
 reg [21:0] shift_reg;
 reg [4:0] count; // used to count the shift registers
 reg ledFlag;
-
+reg [9:0]scount;
 initial begin
-ledFlag <=0;
+strobe <= 0;
+ledFlag <= 0;
+count <= 0;
+shift_reg <= 0;
+scount <= 0;
 end
 
 // note: PS2Clk only running when a button hit. off otherwise. 
 always @(negedge PS2Clk) begin 
-if (count  < 12) begin // getting first packet
-	shift_reg[count]<= PS2Data;
-	count <= count +1;
-end else if(count == 11) begin
-	if(shift_reg[8:1] == 8'b11110000)begin // check if F0 
-	 ledFlag <=1; // indicates that the button released --need to turn LED on
+shift_reg <= {shift_reg[20-:20], PS2Data}; //shift to left
+count <= count + 1;
+
+if(count == 11) begin
+  if(shift_reg[10-:8] == 8'hf0)begin // check if F0 
+	ledFlag <=1; // indicates that the button released --need to turn LED on
  	end else begin 
 	count <= 0; // not released, reset counter and wait for next packet.
+	ledFlag<=0;
 end 
-end else if((count >= 12) & (count > 22))begin // button was released, get key code
-	shift_reg[count] <= PS2Data; // should be & or &&  ????
-	count <= count + 1; 	
-end else begin 
-	count <= count; // default, should not reach.
-end
-end
-integer i = 0; 
-always @(posedge clk, ledFlag) begin
-if(ledFlag)begin
-  for(i = 0; i <= 100; i = i + 1) begin // need to keep LED on for 100ms
-	strobe <= 1;  
-	end
-	ledFlag <=0; // hmm driving in two always modules? 
-	strobe <= 0;
-end else if(clk)begin
- if(count == 21)begin
-	key_code <= shift_reg[8:0]; // save key code 
- 	
-end // need else?	 
+end 
 end
 
+reg syncFlag;
+//clock be .1 ms
+always @(posedge clk) begin
+if(clk)begin
+ if(ledFlag && syncFlag)begin
+    scount <= 1000;
+ end 
+ 
+ if(scount > 0) begin
+    syncFlag <= 0;
+    strobe <=  1;
+    scount <= scount - 1;
+ else begin 
+    syncFlag <= 1;
+    strobe <= 0;
+ end
+    
+    end 
+ if(count == 22)begin
+	key_code <= shift_reg[10-:8]; // save key code 
+end // need else?	 
+end
 end
 
 endmodule 

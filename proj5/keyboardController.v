@@ -20,44 +20,44 @@ input clk, PS2Clk, PS2Data;
 output reg [7:0] key_code; 
 output reg strobe; 
 reg [21:0] shift_reg;
-reg [4:0] count; //used to count the shift registers
+reg [4:0] count; // used to count the shift registers
 reg ledFlag;
 
 initial begin
 ledFlag <=0;
 end
 
-//note: PS2Clk only running when a button hit. off otherwise. 
+// note: PS2Clk only running when a button hit. off otherwise. 
 always @(negedge PS2Clk) begin 
-if (count  < 12) begin //getting first packet
+if (count  < 12) begin // getting first packet
 	shift_reg[count]<= PS2Data;
 	count <= count +1;
-end else if(count == 11) begin //want to check if F0 
-	if(shift_reg[8:1] == 8'b11110000)begin //check if F0 
-	 ledFlag <=1; //indicates that the button released --need to turn LED on
- 	end else begin  //takes care of case with E0
-	count <= 0; //not released, reset counter and wait for next packet.
+end else if(count == 11) begin
+	if(shift_reg[8:1] == 8'b11110000)begin // check if F0 
+	 ledFlag <=1; // indicates that the button released --need to turn LED on
+ 	end else begin 
+	count <= 0; // not released, reset counter and wait for next packet.
 end 
-end else if((count >= 12) & (count > 22))begin //button was released, get key code
-	shift_reg[count] <= PS2Data; //should be & or &&
+end else if((count >= 12) & (count > 22))begin // button was released, get key code
+	shift_reg[count] <= PS2Data; // should be & or &&  ????
 	count <= count + 1; 	
 end else begin 
-	count <= count; //default, should not reach.
+	count <= count; // default, should not reach.
 end
 end
 integer i = 0; 
 always @(posedge clk, ledFlag) begin
 if(ledFlag)begin
-  for(i = 0; i <= 100; i = i + 1) begin //need to keep LED on for 100ms
+  for(i = 0; i <= 100; i = i + 1) begin // need to keep LED on for 100ms
 	strobe <= 1;  
 	end
-	ledFlag <=0; //hmm driving in two always modules? 
+	ledFlag <=0; // hmm driving in two always modules? 
 	strobe <= 0;
 end else if(clk)begin
  if(count == 21)begin
-	key_code <= shift_reg[8:0]; //save key code 
+	key_code <= shift_reg[8:0]; // save key code 
  	
-end //need else?	 
+end // need else?	 
 end
 
 end

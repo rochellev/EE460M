@@ -32,6 +32,8 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
     shift_reg <= 0;
     scount <= 0;
     strobeState <= 0;
+    key_code1 <= 0;
+    key_code0 <= 0;
   end
 
   `define PS2_OLD_VAL ((shift_reg & {2'b00, 20'h001fe}) >> 1)

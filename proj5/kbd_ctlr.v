@@ -24,7 +24,9 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
   reg[21:0] shift_reg;
   wire[21:0] shift_reg_cur;
   reg[3:0] count = 0; // used to count the shift registers
+  
   reg ledFlag;
+  wire ledFlagPulse;
   reg[9:0] scount;
   reg strobeState;
   
@@ -42,7 +44,7 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
   `define KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY 500
   wire clk10Khz;
   
-  complexDivider kbDiv(clk100Mhz, `KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);
+  complexDivider kbdDiv(clk100Mhz, `KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);
 
   assign shift_reg_cur = { PS2Data, shift_reg[21-:21] };
 
@@ -50,6 +52,8 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
   `define PS2_KEY_CODE_0 ((shift_reg_cur & {2'b00, 20'h0f000}) >> 12)
   `define PS2_KEY_CODE_1 ((shift_reg_cur & {2'b00, 20'hf0000}) >> 16)
 
+  single_pulse s_pLedFlagPulse(clk10Khz, ledFlag, ledFlagPulse);
+  
   // note: PS2Clk only running when a button hit. off otherwise. 
   always @(negedge PS2Clk) begin 
     shift_reg <= { PS2Data, shift_reg[21-:21] }; //want to shift into right most bit, so in order
@@ -71,20 +75,18 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
   always @(posedge clk10Khz) begin
     case(strobeState)
       0: begin 
-        if(ledFlag) begin 
+        if(ledFlagPulse) begin 
           scount <= 999;
           strobe <= 1;
           strobeState <= 1;
-          syncFlag <= 0;
         end
       end
       1: begin
         if(scount == 0) begin
           strobe <= 0;
           strobeState <= 0;
-          syncFlag <= 1;
         end else begin 
-            scount <= scount - 1;
+          scount <= scount - 1;
         end
       end
     endcase

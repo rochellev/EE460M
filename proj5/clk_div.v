@@ -33,7 +33,7 @@ module complexDivider(clk100Mhz, timeDelay, slowClk);
   reg[27:0] counter;
 
   initial begin
-    counter = 1;
+    counter = 0;
     slowClk = 0;
   end
 
@@ -47,5 +47,5 @@ module complexDivider(clk100Mhz, timeDelay, slowClk);
       counter <= counter + 1;
     end
   end
-
+  
 endmodule

@@ -33,7 +33,7 @@
   
 */
 
-module proj4_7seg4(en7Seg, hex1, hex0, clk, anodes, segs, decimalPt);
+module proj5_7seg2(en7Seg, hex1, hex0, clk, anodes, segs, decimalPt);
   input en7Seg;
   input[3:0] hex1, hex0;
   input clk;
@@ -44,29 +44,30 @@ module proj4_7seg4(en7Seg, hex1, hex0, clk, anodes, segs, decimalPt);
   
   wire clk7Seg;
   reg anodeCtr;
+  
   localparam[27:0] clk7SegPeriod = 166666;
   complexDivider clkDiv7Seg(clk, clk7SegPeriod, clk7Seg); //~1/60-second period
+  
   reg[3:0] hexCur;
   
-  `define proj4_7seg4_FIRST_DIG 4'he
-  `define proj4_7seg4_SECOND_DIG 4'hd
+  `define proj5_7seg2_FIRST_DIG 4'he
+  `define proj5_7seg2_SECOND_DIG 4'hd
   
-  localparam di = 1'b1; //decimal points should all be disabled
+  localparam di = 1; //decimal points should all be disabled
   sevenSeg ss(hexCur, di, segs, decimalPt); 
   
   always@(posedge clk7Seg) begin    
     anodeCtr <= ~anodeCtr;
     if(!en7Seg) begin 
       anodes <= 4'hf;
-      hexCur <= hex0;
     end else begin
       case(anodeCtr)
         0: begin
-          anodes <= `proj4_7seg4_FIRST_DIG;
+          anodes <= `proj5_7seg2_FIRST_DIG;
           hexCur <= hex0;
         end
         1: begin
-          anodes <= `proj4_7seg4_SECOND_DIG;
+          anodes <= `proj5_7seg2_SECOND_DIG;
           hexCur <= hex1;
         end
       endcase  

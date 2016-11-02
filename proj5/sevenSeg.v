@@ -85,5 +85,5 @@ module sevenSeg(n, Di, s, Do);
     digits[15] = `ss_F;
   end
   
-  assign {s, Do} = {digits[n > 4'h9 ? 4'h9: n], Di};
+  assign {s, Do} = {digits[n], Di};
 endmodule

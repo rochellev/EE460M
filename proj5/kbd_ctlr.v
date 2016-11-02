@@ -17,9 +17,12 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
   input clk100Mhz, PS2Clk, PS2Data;
   
   output reg[3:0] key_code1, key_code0;
-  output reg key_code_en, strobe; 
+  output reg key_code_en = 0;
+  output reg strobe; 
+  
   
   reg[21:0] shift_reg;
+  wire[21:0] shift_reg_cur;
   reg[3:0] count = 0; // used to count the shift registers
   reg ledFlag;
   reg[9:0] scount;
@@ -35,15 +38,17 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
     key_code1 <= 0;
     key_code0 <= 0;
   end
-
-  `define PS2_OLD_VAL ((shift_reg & {2'b00, 20'h001fe}) >> 1)
-  `define PS2_KEY_CODE_0 ((shift_reg & {2'b00, 20'h0f000}) >> 12)
-  `define PS2_KEY_CODE_1 ((shift_reg & {2'b00, 20'hf0000}) >> 16)
   
   `define KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY 500
   wire clk10Khz;
   
   complexDivider kbDiv(clk100Mhz, `KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);
+
+  assign shift_reg_cur = { PS2Data, shift_reg[21-:21] };
+
+  `define PS2_OLD_VAL ((shift_reg_cur & {2'b00, 20'h001fe}) >> 1)
+  `define PS2_KEY_CODE_0 ((shift_reg_cur & {2'b00, 20'h0f000}) >> 12)
+  `define PS2_KEY_CODE_1 ((shift_reg_cur & {2'b00, 20'hf0000}) >> 16)
 
   // note: PS2Clk only running when a button hit. off otherwise. 
   always @(negedge PS2Clk) begin 
@@ -51,7 +56,7 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
     count <= (count == 10)? 0: count + 1;
 
     if(count == 10) begin
-      if(`PS2_OLD_VAL == 8'hf0) begin // check if F0 
+      if(`PS2_OLD_VAL == 22'hf0) begin // check if F0 
         ledFlag <= 1;
         key_code0 <= `PS2_KEY_CODE_0;
         key_code1 <= `PS2_KEY_CODE_1;
@@ -70,14 +75,17 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
           scount <= 999;
           strobe <= 1;
           strobeState <= 1;
+          syncFlag <= 0;
         end
       end
       1: begin
-        scount <= scount - 1;
         if(scount == 0) begin
           strobe <= 0;
           strobeState <= 0;
-        end  
+          syncFlag <= 1;
+        end else begin 
+            scount <= scount - 1;
+        end
       end
     endcase
   end

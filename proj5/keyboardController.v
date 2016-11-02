@@ -9,11 +9,11 @@ clk: regular system clk
 key_code: output, key that was hit
 PS2Data: the 11 bit words
 strobe: output to led, led on only when release key
-internals ---
+
 
 */
 
-module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe);
+module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe, ledT);
 input clk100Mhz, PS2Clk, PS2Data;
 output reg[3:0] key_code1, key_code0;
 output reg key_code_en, strobe; 
@@ -21,12 +21,14 @@ reg[21:0] shift_reg;
 reg[4:0] count; // used to count the shift registers
 reg ledFlag;
 reg[9:0] scount;
+output reg ledT;
 initial begin
 strobe <= 0;
 ledFlag <= 0;
 count <= 0;
 shift_reg <= 0;
 scount <= 0;
+ledT <= 0;
 end
 
 wire clk10Khz;
@@ -34,11 +36,12 @@ wire clk10Khz;
 
 // note: PS2Clk only running when a button hit. off otherwise. 
 always @(negedge PS2Clk) begin 
-    shift_reg <= {shift_reg[20-:21], PS2Data}; //shift to left
+    ledT <=1;
+    shift_reg <= { PS2Data, shift_reg[20-:21] }; //want to shift into right most bit, so in order
     count <= count + 1;
-
+  
   if(count == 11) begin
-      if(shift_reg[9-:8] == 8'h0f)begin // check if F0 
+      if(shift_reg[19-:8] == 8'hf0)begin // check if F0 
         ledFlag <=1; // indicates that the button released --need to turn LED on
       end else begin 
         count <= 0; // not released, reset counter and wait for next packet.
@@ -47,10 +50,10 @@ always @(negedge PS2Clk) begin
   end 
   
   if(count == 22) begin
-    key_code_en <= 1;
-    key_code0 <= shift_reg[9-:4]; // save key code
-    key_code1 <= shift_reg[5-:4]; // save key code
-    count <= 0;
+     key_code_en <= 1;
+     key_code0 <= shift_reg[15-:4]; // save key code
+     key_code1 <= shift_reg[19-:4]; // save key code
+     count <= 0; 
   end
 end
 
@@ -68,7 +71,9 @@ reg syncFlag;
          end else begin 
             syncFlag <= 1;
             strobe <= 0;
-         end 	 
+         end
+         
+        
     end
 
 endmodule 

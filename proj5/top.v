@@ -12,13 +12,15 @@ module top(PS2Clk, clk100Mhz, sw, PS2Data, vgaRed, vgaGreen, vgaBlue,
   
   wire[3:0] key_code1, key_code0;
   wire en7Seg;
+
+  wire[9:0] x, y;
   
   `define TOP_CLKDIV100MHZ_TO_25MHZ_DELAY 2
   wire clk25Mhz;
   
   complexDivider clkDiv100to25Mhz(clk100Mhz, `TOP_CLKDIV100MHZ_TO_25MHZ_DELAY, clk25Mhz);
+  vga_ctlr top_vga_ctlr(clk25Mhz, sw, vgaRed, vgaGreen, vgaBlue, Hsync, Vsync, x, y);
   
-  vga_ctlr top_vga_ctlr(clk25Mhz, sw, vgaRed, vgaGreen, vgaBlue, Hsync, Vsync);
   //module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe);
   ps2 keyb(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, en7Seg, strobe);
   //module proj4_7seg4(en7Seg, bcd0, bcd1, bcd2, bcd3, clk, anodes, segs, decimalPt);

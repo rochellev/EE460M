@@ -19,11 +19,13 @@
     Do: decimal point. Active low.
 */
 
-module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
+module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync, x, y);
   input pxlClk25Mhz;
   input[7:0] pxl_color;
+  
   output reg[3:0] R, G, B;
   output reg hSync, vSync;
+  output[9:0] x, y;
   
   wire[3:0] RInternal, GInternal, BInternal; 
   
@@ -43,6 +45,9 @@ module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync);
     hSyncCtr <= 0;
     vSyncCtr <= 0;
   end
+  
+  assign x = hSyncCtr;
+  assign y = vSyncCtr;
   
   colors vga_color(pxl_color, RInternal, GInternal, BInternal);
   

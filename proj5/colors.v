@@ -1,6 +1,8 @@
-module colors(sw, R, G, B);
+module colors(sw, Rout, Gout, Bout);
   input[7:0] sw;
-  output reg[3:0] R, G, B;
+  output[3:0] Rout, Gout, Bout;
+
+  reg[3:0] R, G, B;
 
   reg colorsIndex;
   
@@ -12,6 +14,8 @@ module colors(sw, R, G, B);
   `define COLORS_ORANGE 12'hF60
   `define COLORS_YELLOW 12'hFF0
   `define COLORS_WHITE 12'hFFF
+  
+  assign {Rout, Gout, Bout} = {R, G, B};
   
   always@(*) begin 
     case(sw)

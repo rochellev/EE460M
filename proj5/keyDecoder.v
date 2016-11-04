@@ -9,52 +9,59 @@ s, p, r, esc, rt, lf, up, dn,
 */
 
 
-module keyDecoder(clk, key_code1, key_code0, strobe, s, p, r, esc, rt, lf, up, dn);
-input clk;
-input [3:0] key_code1, key_code0;
-input strobe;
-output reg  s, p, r, esc, rt, lf, up, dn; 
-reg[7:0]code=0; 
-reg[7:0] prevCode;
+module keyDecoder(clk100Mhz, key_code1, key_code0, strobe, s, p, r, esc, up, dn, lf, rt);
+  input clk100Mhz;
+  input [3:0] key_code1, key_code0;
+  input strobe;
+  
+  output reg s, p, r, esc, up, dn, lf, rt; 
+  
+  wire[7:0]code; 
+  reg[7:0] prevCode = 0;
 
-`define S 8'h1B
-`define P 8'h4D
-`define R 8'h2D
-`define ESC 8'h76
-`define Rt 8'h74
-`define Lf 8'h6B
-`define Up 8'h75
-`define Dn 8'h72
+  `define S 8'h1B
+  `define P 8'h4D
+  `define R 8'h2D
+  `define ESC 8'h76
+  `define Rt 8'h74
+  `define Lf 8'h6B
+  `define Up 8'h75
+  `define Dn 8'h72
 
+  `define KEY_DECODER_CLKDIV100MHZ_TO_10KHZ_DELAY 500
+  wire clk10Khz;
+  
+  complexDivider keyDecoderDiv(clk100Mhz, `KEY_DECODER_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);
 
-always @(posedge clk)begin 
-  if(strobe && (code != prevCode)) begin
-    // defaults, so don't have to assign in each if statement
-    s <= 0;   p <= 0; r <= 0;   esc <= 0;
-    rt <= 0;  lf <=0;  up <= 0;  dn <= 0;
-    code = {key_code1, key_code0}; 
-    if(code == `S )begin
-      s <= 1;
-      prevCode <= `S;
-    end else if(code == `P )begin
-      p <= 1;
-      prevCode <= `P;
-    end else if(code == `R )begin
-      r <= 1;
-      prevCode <= `R;
-    end else if(code == `ESC )begin
-      esc <= 1;
-      prevCode <= `ESC;
-    end else if(code == `Lf )begin
-      lf <= 1;
-      prevCode <= `Lf;
-    end else if(code == `Up )begin
-      up <= 1;
-      prevCode <= `Up;
-    end else if(code == `Dn )begin
-      dn <= 1;
-      prevCode <= `Dn;
+  assign code = {key_code1, key_code0}; 
+  
+  always @(posedge clk10Khz) begin 
+    if(strobe && (code != prevCode)) begin
+      // defaults, so don't have to assign in each if statement
+      s <= 0;   p <= 0; r <= 0;   esc <= 0;
+      rt <= 0;  lf <=0;  up <= 0;  dn <= 0;
+      if(code == `S )begin
+        s <= 1;
+        prevCode <= `S;
+      end else if(code == `P )begin
+        p <= 1;
+        prevCode <= `P;
+      end else if(code == `R )begin
+        r <= 1;
+        prevCode <= `R;
+      end else if(code == `ESC )begin
+        esc <= 1;
+        prevCode <= `ESC;
+      end else if(code == `Lf )begin
+        lf <= 1;
+        prevCode <= `Lf;
+      end else if(code == `Up )begin
+        up <= 1;
+        prevCode <= `Up;
+      end else if(code == `Dn )begin
+        dn <= 1;
+        prevCode <= `Dn;
+      end
     end
   end
-end
 endmodule 

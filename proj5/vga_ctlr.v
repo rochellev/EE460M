@@ -19,9 +19,9 @@
     Do: decimal point. Active low.
 */
 
-module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync, x, y);
+module vga_ctlr(pxlClk25Mhz, Rin, Gin, Bin, R, G, B, hSync, vSync, x, y);
   input pxlClk25Mhz;
-  input[7:0] pxl_color;
+  input[3:0] Rin, Gin, Bin;
   
   output reg[3:0] R, G, B;
   output reg hSync, vSync;
@@ -49,8 +49,6 @@ module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync, x, y);
   assign x = hSyncCtr;
   assign y = vSyncCtr;
   
-  colors vga_color(pxl_color, RInternal, GInternal, BInternal);
-  
   always@(posedge pxlClk25Mhz) begin
     //hSync
     hSyncCtr <= (hSyncCtr == `VGA_CTLR_HSYNC_MAX)? 0: hSyncCtr + 1;
@@ -68,7 +66,7 @@ module vga_ctlr(pxlClk25Mhz, pxl_color, R, G, B, hSync, vSync, x, y);
     {R, G, B} <= (((hSyncCtr < `VGA_CTLR_HSYNC_BLANK_START)
                 || (hSyncCtr == `VGA_CTLR_HSYNC_MAX))  
                 && ((vSyncCtr < `VGA_CTLR_VSYNC_BLANK_START)
-                ||(hSyncCtr == `VGA_CTLR_VSYNC_MAX)))? {RInternal, GInternal, BInternal}
+                ||(hSyncCtr == `VGA_CTLR_VSYNC_MAX)))? {Rin, Gin, Bin}
                 : {4'h0, 4'h0, 4'h0};      
   end
 endmodule

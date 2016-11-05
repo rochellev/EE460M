@@ -28,40 +28,55 @@ module keyDecoder(clk100Mhz, key_code1, key_code0, strobe, s, p, r, esc, up, dn,
   `define Up 8'h75
   `define Dn 8'h72
 
-  `define KEY_DECODER_CLKDIV100MHZ_TO_10KHZ_DELAY 500
+  `define KEY_DECODER_CLKDIV100MHZ_TO_10KHZ_DELAY 5000
+  `define KEY_DECODER_KEY_PULSE_DELAY 249
+  
   wire clk10Khz;
   
   complexDivider keyDecoderDiv(clk100Mhz, `KEY_DECODER_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);
 
   assign code = {key_code1, key_code0}; 
   
+  reg decoderState = 0;
+  
+  reg[7:0] pulseCtr = 0;
   always @(posedge clk10Khz) begin 
-    if(strobe && (code != prevCode)) begin
-      // defaults, so don't have to assign in each if statement
-      s <= 0;   p <= 0; r <= 0;   esc <= 0;
-      rt <= 0;  lf <=0;  up <= 0;  dn <= 0;
-      if(code == `S )begin
-        s <= 1;
-        prevCode <= `S;
-      end else if(code == `P )begin
-        p <= 1;
-        prevCode <= `P;
-      end else if(code == `R )begin
-        r <= 1;
-        prevCode <= `R;
-      end else if(code == `ESC )begin
-        esc <= 1;
-        prevCode <= `ESC;
-      end else if(code == `Lf )begin
-        lf <= 1;
-        prevCode <= `Lf;
-      end else if(code == `Up )begin
-        up <= 1;
-        prevCode <= `Up;
-      end else if(code == `Dn )begin
-        dn <= 1;
-        prevCode <= `Dn;
-      end
-    end
+    case(decoderState)
+        0: begin
+            if(strobe) begin 
+                pulseCtr <= 0;
+                decoderState <= 1;
+                prevCode <= code;
+            end
+        end
+        
+        1: begin
+          pulseCtr <= pulseCtr + 1;
+          if(pulseCtr == 0) begin
+              if(prevCode == `S )begin
+                s <= 1;
+              end else if(prevCode == `P )begin
+                p <= 1;
+              end else if(prevCode == `R )begin
+                r <= 1;
+              end else if(prevCode == `ESC )begin
+                esc <= 1;
+              end else if(prevCode == `Up )begin
+                up <= 1;
+              end else if(prevCode == `Dn )begin
+                dn <= 1;
+              end else if(prevCode == `Lf )begin
+                lf <= 1;
+              end else if(prevCode == `Rt )begin
+                rt <= 1;
+              end
+          end else if(pulseCtr == `KEY_DECODER_KEY_PULSE_DELAY) begin 
+            // defaults, so don't have to assign in each if statement
+            s <= 0;   p <= 0; r <= 0;   esc <= 0;
+            rt <= 0;  lf <=0;  up <= 0;  dn <= 0;
+            decoderState <= 0;
+          end 
+        end
+    endcase
   end
 endmodule 

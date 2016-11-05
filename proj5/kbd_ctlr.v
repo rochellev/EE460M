@@ -41,7 +41,7 @@ module ps2(clk100Mhz, PS2Clk, PS2Data, key_code1, key_code0, key_code_en, strobe
     key_code0 <= 0;
   end
   
-  `define KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY 500
+  `define KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY 5000
   wire clk10Khz;
   
   complexDivider kbdDiv(clk100Mhz, `KDB_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);

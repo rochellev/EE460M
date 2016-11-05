@@ -9,8 +9,6 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   
   wire[7:0] pxl_color;
   
-  reg gameOver;
-  
   `define S 8'h1B
   `define P 8'h4D
   `define R 8'h2D
@@ -20,7 +18,10 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   `define Up 8'h75
   `define Dn 8'h72
   
-  reg[7:0] dir = `Rt;
+  `define SNAKE_CTLR_CLKDIV100MHZ_TO_40HZ_DELAY 1250000
+    wire clk40Hz;
+    
+    complexDivider snakeGameLogicDiv(clk100Mhz, `SNAKE_CTLR_CLKDIV100MHZ_TO_40HZ_DELAY, clk40Hz);
   
   `define SNAKE_CTLR_SNAKE_HEAD 0
   
@@ -40,59 +41,91 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   reg[9:0] snakeY[0:`SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1];
   
   reg[0:`SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1] drawSnake;
-  reg snakeSize = `SNAKE_CTLR_NUM_SNAKE_PIECES_INIT;
+  reg[2:0] snakeSize = `SNAKE_CTLR_NUM_SNAKE_PIECES_INIT;
   
   reg[1:0] gameState = 0;
+  reg paused = 0;
+  reg gameOverState = 0;
+  reg stopped = 1;
+  reg[7:0] dir = `Rt;
+  reg[0:`SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1] gameOver;
   
-  `define SNAKE_CTLR_CLKDIV100MHZ_TO_60HZ_DELAY 833333
-  `define SNAKE_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY 500
-  wire clk60Hz, clk10Khz;
-  
-  complexDivider snakeGameLogicDiv(clk100Mhz, `SNAKE_CTLR_CLKDIV100MHZ_TO_60HZ_DELAY, clk60Hz);
-  complexDivider gameOverDiv(clk100Mhz, `SNAKE_CTLR_CLKDIV100MHZ_TO_10KHZ_DELAY, clk10Khz);
-  
-  always@(posedge clk60Hz) begin
+  reg[1:0] frameCtr = 0;
+  always@(posedge clk40Hz) begin
+    frameCtr <= (frameCtr == 3)? 0: frameCtr + 1;
     case(gameState)
       0: begin
-        gameState <= (start);
+        if(paused) begin 
+          if(resume) begin 
+            paused <= 0;
+            gameState <= 1;
+          end
+        end else if(gameOverState) begin 
+            if(start) begin 
+              gameOverState <= 0;  
+            end
+        end else if(stopped) begin
+            if(start) begin 
+                stopped <= 0;
+            end
+        end else begin
+            dir <= `Rt;
+            for(i = `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1; i >= 0; i = i - 1) begin 
+              if(i < snakeSize) begin
+                  snakeX[(snakeSize - 1) - i] <= i * `SNAKE_CTLR_SNAKE_PIECE_WIDTH;
+                  snakeY[(snakeSize - 1) - i] <= 0;
+              end
+            end
+            
+            gameState <= 1;
+        end    
       end
       
       1: begin
-        if(stop) begin 
+        if(start) begin 
+            gameState <= 0;
+        end else if(stop) begin 
+          stopped <= 1;
           gameState <= 0;
         end else if(pause) begin 
-          gameState <= 2;
-        end else if(gameOver) begin
+          paused <= 1;
+          gameState <= 0;
+        end else if(|gameOver) begin
+          gameOverState <= 1;
           gameState <= 0;
         end else begin
-          if(u && (dir != `Dn)) begin 
-            snakeY[`SNAKE_CTLR_SNAKE_HEAD] <= snakeY[`SNAKE_CTLR_SNAKE_HEAD]
-                                            + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT;
+          if(u && (dir != `Dn)) begin
             dir <= `Up;
           end if(r && (dir != `Lf)) begin 
-            snakeX[`SNAKE_CTLR_SNAKE_HEAD] <= snakeY[`SNAKE_CTLR_SNAKE_HEAD]
-                                            + `SNAKE_CTLR_SNAKE_PIECE_WIDTH;
             dir <= `Rt;
           end if(l && (dir != `Rt)) begin 
-            snakeX[`SNAKE_CTLR_SNAKE_HEAD] <= snakeY[`SNAKE_CTLR_SNAKE_HEAD]
-                                            - `SNAKE_CTLR_SNAKE_PIECE_WIDTH;
             dir <= `Lf;
-          end if(d && (dir != `Up)) begin 
-            snakeY[`SNAKE_CTLR_SNAKE_HEAD] <= snakeY[`SNAKE_CTLR_SNAKE_HEAD]
-                                            - `SNAKE_CTLR_SNAKE_PIECE_HEIGHT;
+          end if(d && (dir != `Up)) begin
             dir <= `Dn;
           end
           
-          for(i = 1; i < `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX; i = i + 1) begin 
-            snakeX[i] <= snakeX[i - 1];
-            snakeY[i] <= snakeY[i - 1];
+          if(frameCtr == 0) begin
+              if(dir == `Up) begin 
+                  snakeY[`SNAKE_CTLR_SNAKE_HEAD] <= snakeY[`SNAKE_CTLR_SNAKE_HEAD]
+                                                  - `SNAKE_CTLR_SNAKE_PIECE_HEIGHT;
+                end if(dir == `Rt) begin 
+                  snakeX[`SNAKE_CTLR_SNAKE_HEAD] <= snakeX[`SNAKE_CTLR_SNAKE_HEAD]
+                                                  + `SNAKE_CTLR_SNAKE_PIECE_WIDTH;
+                end if(dir == `Lf) begin 
+                  snakeX[`SNAKE_CTLR_SNAKE_HEAD] <= snakeX[`SNAKE_CTLR_SNAKE_HEAD]
+                                                  - `SNAKE_CTLR_SNAKE_PIECE_WIDTH;
+                end if(dir == `Dn) begin 
+                  snakeY[`SNAKE_CTLR_SNAKE_HEAD] <= snakeY[`SNAKE_CTLR_SNAKE_HEAD]
+                                                  + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT;
+                end
+              
+              for(i = 1; i < `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX; i = i + 1) begin 
+                if(i < snakeSize) begin
+                    snakeX[i] <= snakeX[i - 1];
+                    snakeY[i] <= snakeY[i - 1];
+                end
+              end
           end
-        end
-      end
-      
-      2: begin 
-        if(resume) begin 
-          gameState <= 1;
         end
       end
     endcase
@@ -100,10 +133,10 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   
   always@(*) begin 
     drawSnake <= 0;
-    if(!stop && (x < `SNAKE_CTLR_DISPLAY_WIDTH)
+    if(!stopped && (x < `SNAKE_CTLR_DISPLAY_WIDTH)
        && (y < `SNAKE_CTLR_DISPLAY_HEIGHT)) begin
       for(i = 0; i < `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX; i = i + 1) begin 
-        if(i <= snakeSize) begin
+        if(i < snakeSize) begin
           drawSnake[i] <= ((x < (snakeX[i] + `SNAKE_CTLR_SNAKE_PIECE_WIDTH)
                                  && x > snakeX[i]) &&
                                  (y < (snakeY[i] + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT)
@@ -116,16 +149,16 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   assign pxl_color = (|drawSnake)? `SNAKE_CTLR_RED: sw;
   colors vga_color(pxl_color, Rout, Gout, Bout);
   
-  always@(posedge clk10Khz) begin 
+  always@(*) begin 
     gameOver <= ((snakeX[`SNAKE_CTLR_SNAKE_HEAD] > `SNAKE_CTLR_DISPLAY_WIDTH)
                  || (snakeY[`SNAKE_CTLR_SNAKE_HEAD] > `SNAKE_CTLR_DISPLAY_HEIGHT));
                  
     for(i = 1; i < `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX; i = i + 1) begin 
-      if(i <= snakeSize) begin
-        gameOver <= gameOver || ((snakeX[`SNAKE_CTLR_SNAKE_HEAD] < (snakeX[i] + `SNAKE_CTLR_SNAKE_PIECE_WIDTH)
-                                 && snakeX[`SNAKE_CTLR_SNAKE_HEAD] > snakeX[i]) &&
-                                 (snakeY[`SNAKE_CTLR_SNAKE_HEAD] < (snakeY[i] + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT)
-                                 && snakeY[`SNAKE_CTLR_SNAKE_HEAD] > snakeY[i]));
+      if(i < snakeSize) begin
+        gameOver[i] <= ((snakeX[`SNAKE_CTLR_SNAKE_HEAD] < (snakeX[i] + `SNAKE_CTLR_SNAKE_PIECE_WIDTH)
+                     && snakeX[`SNAKE_CTLR_SNAKE_HEAD] > snakeX[i]) &&
+                     (snakeY[`SNAKE_CTLR_SNAKE_HEAD] < (snakeY[i] + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT)
+                     && snakeY[`SNAKE_CTLR_SNAKE_HEAD] > snakeY[i]));
       end
     end 
   end

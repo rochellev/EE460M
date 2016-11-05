@@ -27,7 +27,7 @@ module colors(sw, Rout, Gout, Bout);
       32: begin {R, G, B} <= `COLORS_ORANGE; end
       64: begin {R, G, B} <= `COLORS_YELLOW; end
       128: begin {R, G, B} <= `COLORS_WHITE; end
-      default: begin {R, G, B} <= `COLORS_WHITE; end
+      default: begin {R, G, B} <= `COLORS_BLACK; end
     endcase
   end
 endmodule

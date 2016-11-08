@@ -9,12 +9,12 @@ s, p, r, esc, rt, lf, up, dn,
 */
 
 
-module keyDecoder(clk100Mhz, key_code1, key_code0, strobe, s, p, r, esc, up, dn, lf, rt);
+module keyDecoder(clk100Mhz, key_code1, key_code0, strobe, s, p, r, esc, up, dn, lf, rt, plus, minus);
   input clk100Mhz;
   input [3:0] key_code1, key_code0;
   input strobe;
   
-  output reg s, p, r, esc, up, dn, lf, rt; 
+  output reg s, p, r, esc, up, dn, lf, rt, plus, minus; 
   
   wire[7:0]code; 
   reg[7:0] prevCode = 0;
@@ -27,6 +27,8 @@ module keyDecoder(clk100Mhz, key_code1, key_code0, strobe, s, p, r, esc, up, dn,
   `define Lf 8'h6B
   `define Up 8'h75
   `define Dn 8'h72
+  `define PLUS 8'h55
+  `define MINUS 8'h4e
 
   `define KEY_DECODER_CLKDIV100MHZ_TO_10KHZ_DELAY 5000
   `define KEY_DECODER_KEY_PULSE_DELAY 249
@@ -69,11 +71,15 @@ module keyDecoder(clk100Mhz, key_code1, key_code0, strobe, s, p, r, esc, up, dn,
                 lf <= 1;
               end else if(prevCode == `Rt )begin
                 rt <= 1;
+              end else if(prevCode == `PLUS) begin 
+                plus <= 1;
+              end else if(prevCode == `MINUS) begin 
+                minus <= 1;
               end
           end else if(pulseCtr == `KEY_DECODER_KEY_PULSE_DELAY) begin 
             // defaults, so don't have to assign in each if statement
             s <= 0;   p <= 0; r <= 0;   esc <= 0;
-            rt <= 0;  lf <=0;  up <= 0;  dn <= 0;
+            rt <= 0;  lf <=0;  up <= 0;  dn <= 0; plus <= 0; minus <= 0;
             decoderState <= 0;
           end 
         end

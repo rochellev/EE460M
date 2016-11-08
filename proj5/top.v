@@ -15,6 +15,7 @@ module top(PS2Clk, clk100Mhz, sw, PS2Data, vgaRed, vgaGreen, vgaBlue,
 
   wire start, resume, stop, pause;
   wire up, down, left, right;
+  wire plus, minus;
   
   wire[9:0] x, y;
   
@@ -33,8 +34,8 @@ module top(PS2Clk, clk100Mhz, sw, PS2Data, vgaRed, vgaGreen, vgaBlue,
   proj5_7seg2 keyCodeOut(en7Seg, key_code1, key_code0, clk100Mhz, anodes, segs, decimalPt);
   //module keyDecoder(clk, key_code1, key_code0, s, p, r, esc, rt, lf, up, dn);
   keyDecoder top_keyDecoder(clk100Mhz, key_code1, key_code0, strobe, start, resume, stop, pause,
-                            up, down, left, right);
+                            up, down, left, right, plus, minus);
   //module snake_ctlr(u, d, l, r, start, pause, resume, stop, clkSnakeCtlr, pxlClk25Mhz, pxl_color);
-  snake_ctlr top_snake_ctlr(start, resume, stop, pause, up, down, left, right,
+  snake_ctlr top_snake_ctlr(start, resume, stop, pause, up, down, left, right, plus, minus,
                             sw, x, y, clk100Mhz, R, G, B);
 endmodule

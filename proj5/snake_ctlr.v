@@ -1,5 +1,5 @@
-module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, Rout, Gout, Bout);
-  input start, pause, resume, stop, u, d, l, r, clk100Mhz;
+module snake_ctlr(start, pause, resume, stop, u, d, l, r, speedUp, speedDown, sw, x, y, clk100Mhz, Rout, Gout, Bout);
+  input start, pause, resume, stop, u, d, l, r, speedUp, speedDown, clk100Mhz;
   input[7:0] sw;
   input[9:0] x, y;
   
@@ -19,9 +19,9 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   `define Dn 8'h72
   
   `define SNAKE_CTLR_CLKDIV100MHZ_TO_40HZ_DELAY 1250000
-    wire clk40Hz;
+  wire clk40Hz;
     
-    complexDivider snakeGameLogicDiv(clk100Mhz, `SNAKE_CTLR_CLKDIV100MHZ_TO_40HZ_DELAY, clk40Hz);
+  complexDivider snakeGameLogicDiv(clk100Mhz, `SNAKE_CTLR_CLKDIV100MHZ_TO_40HZ_DELAY, clk40Hz);
   
   `define SNAKE_CTLR_SNAKE_HEAD 0
   
@@ -41,7 +41,19 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   reg[9:0] snakeY[0:`SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1];
   
   reg[0:`SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1] drawSnake;
-  reg[2:0] snakeSize = `SNAKE_CTLR_NUM_SNAKE_PIECES_INIT;
+  reg[4:0] snakeSize = `SNAKE_CTLR_NUM_SNAKE_PIECES_INIT;
+  
+  `define SNAKE_CTLR_RAND_SEED 442
+  
+  reg drawApple;
+  reg[9:0] appleX;
+  reg[9:0] appleY;
+  wire[9:0] appleXRand;
+  wire[9:0] appleYRand;
+  reg[9:0] appleXRandSet;
+  reg[9:0] appleYRandSet;
+  random appleXRandGen(clk40Hz, `SNAKE_CTLR_RAND_SEED, appleXRand);
+  random appleYRandGen(clk40Hz, `SNAKE_CTLR_RAND_SEED + appleXRand, appleYRand);
   
   reg[1:0] gameState = 0;
   reg paused = 0;
@@ -50,19 +62,24 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   reg[7:0] dir = `Rt;
   reg[0:`SNAKE_CTLR_NUM_SNAKE_PIECES_MAX - 1] gameOver;
   
-  reg[1:0] frameCtr = 0;
+  `define SNAKE_CTLR_MOVE_SPEED_DELAY_INIT 3
+  reg[2:0] frameCtrMax = `SNAKE_CTLR_MOVE_SPEED_DELAY_INIT;
+  reg[2:0] frameCtr = 0;
   always@(posedge clk40Hz) begin
-    frameCtr <= (frameCtr == 3)? 0: frameCtr + 1;
+    frameCtr <= (frameCtr == frameCtrMax)? 0: frameCtr + 1;
     case(gameState)
       0: begin
         if(paused) begin 
           if(resume) begin 
             paused <= 0;
             gameState <= 1;
+          end else if(start) begin 
+            paused <= 0;
+            gameState <= 0;
           end
         end else if(gameOverState) begin 
             if(start) begin 
-              gameOverState <= 0;  
+              gameOverState <= 0;
             end
         end else if(stopped) begin
             if(start) begin 
@@ -76,6 +93,11 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
                   snakeY[(snakeSize - 1) - i] <= 0;
               end
             end
+            
+            appleX <= appleXRand % `SNAKE_CTLR_DISPLAY_WIDTH;
+            appleY <= appleYRand % `SNAKE_CTLR_DISPLAY_HEIGHT;
+            
+            snakeSize <= `SNAKE_CTLR_NUM_SNAKE_PIECES_INIT;
             
             gameState <= 1;
         end    
@@ -102,6 +124,17 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
             dir <= `Lf;
           end if(d && (dir != `Up)) begin
             dir <= `Dn;
+          end 
+          
+          if(speedUp) begin 
+            frameCtrMax <= (frameCtrMax == 1)? 1: frameCtrMax - 1;
+          end else if(speedDown) begin 
+            frameCtrMax <= (frameCtrMax == 7)? 7: frameCtrMax + 1;
+          end
+          
+          if(frameCtr != 0) begin
+              appleXRandSet <= appleXRand % `SNAKE_CTLR_DISPLAY_WIDTH;
+              appleYRandSet <= appleYRand % `SNAKE_CTLR_DISPLAY_HEIGHT;
           end
           
           if(frameCtr == 0) begin
@@ -125,6 +158,17 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
                     snakeY[i] <= snakeY[i - 1];
                 end
               end
+              
+           if((snakeX[`SNAKE_CTLR_SNAKE_HEAD] + 5 <= appleX + `SNAKE_CTLR_SNAKE_PIECE_WIDTH)
+              && (snakeX[`SNAKE_CTLR_SNAKE_HEAD] + 5 >= appleX)
+              && (snakeY[`SNAKE_CTLR_SNAKE_HEAD] + 5 <= appleY + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT)
+              && (snakeY[`SNAKE_CTLR_SNAKE_HEAD] + 5 >= appleY)) begin
+               snakeSize <= (snakeSize == `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX)? 
+                             `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX: snakeSize + 1; 
+              
+               appleX <= appleXRandSet;
+               appleY <= appleYRandSet;
+           end
           end
         end
       end
@@ -133,6 +177,7 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
   
   always@(*) begin 
     drawSnake <= 0;
+    drawApple <= 0;
     if(!stopped && (x < `SNAKE_CTLR_DISPLAY_WIDTH)
        && (y < `SNAKE_CTLR_DISPLAY_HEIGHT)) begin
       for(i = 0; i < `SNAKE_CTLR_NUM_SNAKE_PIECES_MAX; i = i + 1) begin 
@@ -142,11 +187,16 @@ module snake_ctlr(start, pause, resume, stop, u, d, l, r, sw, x, y, clk100Mhz, R
                                  (y < (snakeY[i] + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT)
                                  && y > snakeY[i]));
         end                           
-      end 
+      end
+      
+      drawApple <= ((x < (appleX + `SNAKE_CTLR_SNAKE_PIECE_WIDTH)
+                       && x > appleX) &&
+                       (y < (appleY + `SNAKE_CTLR_SNAKE_PIECE_HEIGHT)
+                       && y > appleY)); 
     end
   end
   
-  assign pxl_color = (|drawSnake)? `SNAKE_CTLR_RED: sw;
+  assign pxl_color = (|drawSnake || drawApple)? `SNAKE_CTLR_RED: sw;
   colors vga_color(pxl_color, Rout, Gout, Bout);
   
   always@(*) begin 

@@ -1,3 +1,11 @@
+
+/* Lab 4 Input: Nico Cortes and Rochelle Roberts
+Buttons and switches on board are inputs
+The purpose of this module is to debounce.
+btn_out: output, the debounced value of button in
+ ----> clk has to be slow
+*/
+
 module bcd2dec(bcd, dec);
 	input[15:0] bcd;
 	output[15:0] dec;

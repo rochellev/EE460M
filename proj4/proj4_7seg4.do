@@ -9,4 +9,4 @@ force bcd1 4'h0 0
 force bcd2 4'h0 0
 force bcd3 4'h0 0
 
-run 6 ms
+run 3 ms

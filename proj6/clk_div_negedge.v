@@ -10,7 +10,7 @@ module simpleDivider(clk100Mhz, slowClk);
     counter = 0;
   end
 
-  always @ (posedge clk100Mhz)
+  always @ (negedge clk100Mhz)
   begin
     counter <= counter + 1; //increment the counter every 10ns (1/100 Mhz) cycle.
   end
@@ -37,7 +37,7 @@ module complexDivider(clk100Mhz, timeDelay, slowClk);
     slowClk = 0;
   end
 
-  always @ (posedge clk100Mhz)
+  always @ (negedge clk100Mhz)
   begin
     if(counter == timeDelay) begin
       counter <= 1;

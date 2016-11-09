@@ -54,7 +54,7 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, swtchs, l
   output[7:0] leds;
   output[6:0] segs;
   output[3:0] an;
-
+ //hello!
   a;lskdjfa;slkdjfa;lskdjf;alskdjf
 
 endmodule

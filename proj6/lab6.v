@@ -55,8 +55,40 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, swtchs, l
   output[6:0] segs;
   output[3:0] an;
 
-  a;lskdjfa;slkdjfa;lskdjf;alskdjf
-
+  wire debClk, singlePulseClk;
+  reg btnLDeb, btnRDeb;
+  reg btnLDebouncedSP, btnRDebouncedSP;
+  
+  reg[6:0] spr, dar;
+  reg[7:0] dvr;
+  wire empty;
+  
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ 2750000
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 50000
+  
+  localparam[27:0] debClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ;
+  localparam[27:0] singlePulseClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ;
+  
+  complexDivider(clk, debClkDivDelay, debClk);
+  complexDivider(clk, singlePulseClkDivDelay, singlePulseClk);
+  
+  debouncer btnLDebouncer(clkDeb, btns[1], btnLDeb);
+  debouncer btnRDebouncer(clkDeb, btns[0], btnRDeb);
+  
+  single_pulse btnLSinglePulser(singlePulseClk, btnLDeb, btnLDebouncedSP);
+  single_pulsebtnRSinglePulser(singlePulseClk, btnRDeb, btnRDebouncedSP);
+  
+  proj5_7seg2 dvrContents(1'b1, dvr[7-:4], dvr[3-:4], clk, an, segs, 4'hf);
+  
+  assign leds = {empty, dar};
+  
+  always@() begin 
+    case(mode)
+      case 0: begin 
+        //TODO
+      end
+    endcase
+  end
 endmodule
 
 ///////////////////////////////////////////////////////////////////////////////

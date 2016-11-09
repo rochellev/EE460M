@@ -8,18 +8,20 @@ module top(clk, mode, btns, swtchs, leds, segs, an);
   output[3:0] an;
 
   //might need to change some of these from wires to regs
+  `define Z 8'bZZZZZZZZ
   wire cs;
   wire we;
   wire[6:0] addr;
   wire[7:0] data_out_mem;
   wire[7:0] data_out_ctrl;
   wire[7:0] data_bus;
+  
 
   //MODIFY THE RIGHT HAND SIDE OF THESE TWO STATEMENTS ONLY
-  assign data_bus = 1; // 1st driver of the data bus -- tri state switches,
+  assign data_bus = (we) ? `Z : data_out_ctrl ; // 1st driver of the data bus -- tri state switches,
                        // logical function of we and data_out_ctrl
 
-  assign data_bus = 1; // 2nd driver of the data bus -- tri state switches,
+  assign data_bus = (we) ? data_out_mem: `Z  ; // 2nd driver of the data bus -- tri state switches,
                        // logical function of we and data_out_mem
 
 

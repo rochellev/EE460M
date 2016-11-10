@@ -1,9 +1,9 @@
-module top(clk, mode, btns, swtchs, leds, segs, an);
+module top(clk, mode, btns, sw, led, segs, an);
   input clk;
   input[1:0] mode;
   input[1:0] btns;
-  input[7:0] swtchs;
-  output[7:0] leds;
+  input[7:0] sw;
+  output[7:0] led;
   output[6:0] segs;
   output[3:0] an;
 
@@ -26,7 +26,7 @@ module top(clk, mode, btns, swtchs, leds, segs, an);
 
 
   controller ctrl(clk, cs, we, addr, data_bus, data_out_ctrl, mode,
-    btns, swtchs, leds, segs, an);
+    btns, sw, led, segs, an);
 
   memory mem(clk, cs, we, addr, data_bus, data_out_mem);
 
@@ -54,10 +54,11 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
   output[7:0] leds;
   output[6:0] segs;
   output[3:0] an;
+  wire decimalPt;
 
   wire debClk, singlePulseClk;
-  reg btnLDeb, btnRDeb;
-  reg btnLDebouncedSP, btnRDebouncedSP;
+  wire btnLDeb, btnRDeb;
+  wire btnLDebouncedSP, btnRDebouncedSP;
   
   reg[6:0] spr, dar;
   reg[7:0] dvr;
@@ -65,22 +66,22 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
   
   reg[9:0] ctlrState = 0;
   
-  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ 2750000
-  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 50000
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ 2750000 //the segs are flashing 
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 50000 //not reading buttons
   
   localparam[27:0] debClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ;
   localparam[27:0] singlePulseClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ;
   
-  complexDivider(clk, debClkDivDelay, debClk);
-  complexDivider(clk, singlePulseClkDivDelay, singlePulseClk);
+  complexDivider debounceClk(clk, debClkDivDelay, debClk);
+  complexDivider pulseClk(clk, singlePulseClkDivDelay, singlePulseClk);
   
-  debouncer btnLDebouncer(clkDeb, btns[1], btnLDeb);
-  debouncer btnRDebouncer(clkDeb, btns[0], btnRDeb);
+  debouncer btnLDebouncer(debClk, btns[1], btnLDeb);
+  debouncer btnRDebouncer(debClk, btns[0], btnRDeb);
   
   single_pulse btnLSinglePulser(singlePulseClk, btnLDeb, btnLDebouncedSP);
-  single_pulsebtnRSinglePulser(singlePulseClk, btnRDeb, btnRDebouncedSP);
-  
-  proj5_7seg2 dvrContents(1'b1, dvr[7-:4], dvr[3-:4], clk, an, segs, 4'hf);
+  single_pulse btnRSinglePulser(singlePulseClk, btnRDeb, btnRDebouncedSP);
+   //proj5_7seg2(en7Seg, hex1, hex0, clk, anodes, segs, decimalPt);
+  proj5_7seg2 dvrContents(1'b1, dvr[7-:4], dvr[3-:4], clk, an, segs, decimalPt);
   
   assign empty = (dar)? 0: 1;
   

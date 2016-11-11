@@ -66,8 +66,8 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
   
   reg[9:0] ctlrState = 0;
   
-  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ 2750000 //the segs are flashing 
-  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 50000 //not reading buttons
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ 2750000 
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 500 // was 50000
   
   localparam[27:0] debClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ;
   localparam[27:0] singlePulseClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ;

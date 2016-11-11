@@ -45,7 +45,7 @@ module proj5_7seg2(en7Seg, hex1, hex0, clk, anodes, segs, decimalPt);
   wire clk7Seg;
   reg anodeCtr;
   
-  localparam[27:0] clk7SegPeriod = 833333;
+  localparam[27:0] clk7SegPeriod = 8333; // was  833333
   complexDivider clkDiv7Seg(clk, clk7SegPeriod, clk7Seg); //~1/60-second period
   
   reg[3:0] hexCur;

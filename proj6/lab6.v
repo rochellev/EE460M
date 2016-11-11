@@ -66,8 +66,10 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
   
   reg[9:0] ctlrState = 0;
   
+  reg[7:0] gpr0, gpr1;
+  
   `define MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ 2750000 
-  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 500 // was 50000
+  `define MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ 5000 // was 50000
   
   localparam[27:0] debClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_550HZ;
   localparam[27:0] singlePulseClkDivDelay = `MASTER_CTLR_CLK_DIV_100MHZ_TO_1KHZ;
@@ -88,7 +90,7 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
   assign leds = {empty, dar};
   
   `define CTLR_POP_PUSH_MODE 0
-  `define CTLR_ADD_SUB_MODE 1
+  `define CTLR_SUB_ADD_MODE 1
   `define CTLR_RST_TOP_MODE 2
   `define CTLR_DEC_INC_MODE 3
   
@@ -98,13 +100,41 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
     
     case(ctlrState)
       0: begin 
-        case(sw)
+        case(mode)
           `CTLR_POP_PUSH_MODE: begin 
             if(btnLDebouncedSP) begin 
               ctlrState <= 1;
             end else if(btnRDebouncedSP) begin 
               ctlrState <= 4;
             end
+          end
+          
+          `CTLR_SUB_ADD_MODE: begin 
+            if(btnLDebouncedSP) begin 
+              ctlrState <= 12;
+            end else if(btnRDebouncedSP) begin 
+              ctlrState <= 8;
+            end
+          end
+          
+          `CTLR_RST_TOP_MODE: begin 
+            if(btnLDebouncedSP) begin 
+              ctlrState <= 6;
+            end else if(btnRDebouncedSP) begin 
+              ctlrState <= 7;
+            end
+          end
+          
+          `CTLR_DEC_INC_MODE: begin 
+            if(btnLDebouncedSP) begin 
+              ctlrState <= 0;
+            end else if(btnRDebouncedSP) begin 
+              ctlrState <= 0;
+            end
+          end
+          
+          default: begin 
+            ctlrState <= 0;
           end
         endcase  
       end
@@ -130,16 +160,85 @@ module controller(clk, cs, we, address, data_in, data_out, mode, btns, sw, leds,
       //PUSH
       4: begin 
         we <= 1;
+        cs <= 1;
         address <= spr;
         data_out <= sw;
         ctlrState <= 5;
       end
       
       5: begin
-        we <= 0;
         spr <= spr - 1;
         dar <= spr;
         ctlrState <= 2;
+      end
+      
+      //RST
+      6: begin 
+        spr <= 127;
+        dar <= 0;
+        ctlrState <= 2;
+      end
+      
+      //TOP
+      7: begin 
+        dar <= spr + 1;
+        ctlrState <= 2;
+      end
+      
+      //ADD
+      8: begin 
+        address <= dar;
+        spr <= spr + 1;
+        dar <= spr + 2;
+        ctlrState <= 9;
+      end
+      
+      9: begin
+        address <= dar;
+        gpr0 <= data_in;
+        ctlrState <= 10;
+      end
+      
+      10: begin 
+        gpr1 <= data_in;
+        ctlrState <= 11;
+      end
+      
+      11: begin 
+        we <= 1;
+        cs <= 1;
+        data_out <= gpr0 + gpr1;
+        ctlrState <= 2;
+      end
+      
+       //SUB
+       12: begin 
+         address <= dar;
+         spr <= spr + 1;
+         dar <= spr + 2;
+         ctlrState <= 13;
+       end
+      
+       13: begin
+         address <= dar;
+         gpr0 <= data_in;
+         ctlrState <= 14;
+       end
+      
+       14: begin 
+         gpr1 <= data_in;
+         ctlrState <= 0;
+       end
+      
+      // 15: begin 
+        // we <= 1;
+        // cs <= 1;
+        // data_out <= gpr1 - gpr0;
+        // ctlrState <= 2;
+      // end
+      
+      default: begin 
+        ctlrState <= 0;
       end
     endcase
   end

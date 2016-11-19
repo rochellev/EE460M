@@ -91,11 +91,16 @@ module Complete_MIPS(CLK, RST, HALT, led);
   wire [6:0] ADDR;
   wire [31:0] mem_bus;
   wire[7:0] reg1;
+  wire ledClk;
   
   assign led = reg1;
   
-  MIPS CPU(CLK, RST, HALT, CS, WE, ADDR, Mem_Bus, reg1);
-  Memory MEM(CS, WE, CLK, ADDR, Mem_Bus);
+  `define COMPLETE_MIPS_LED_CLK_DIV_DELAY_100MHZ_TO_1HZ 50000000
+  localparam[27:0] ledClkDivDelay = `COMPLETE_MIPS_LED_CLK_DIV_DELAY_100MHZ_TO_1HZ;
+  complexDivider ledClkDiv(CLK, ledClkDivDelay, ledClk);
+  
+  MIPS CPU(ledClk, RST, HALT, CS, WE, ADDR, mem_bus, reg1);
+  Memory MEM(CS, WE, CLK, ADDR, mem_bus);
 
 endmodule
 
@@ -118,7 +123,7 @@ module Memory(CS, WE, CLK, ADDR, Mem_Bus);
 
   initial
   begin
-    $readmemh("c:/Users/Neeks/Desktop/EE460M/proj7/MIPS_Instructions.hex", RAM);
+    $readmemh("c:/Users/Neeks/Desktop/EE460M/proj7/rot_led.hex", RAM);
   end
 
   assign Mem_Bus = ((CS == 1'b0) || (WE == 1'b1)) ? 32'bZ : data_out;
@@ -187,6 +192,7 @@ endmodule
 
 module MIPS (CLK, RST, HALT, CS, WE, ADDR, Mem_Bus, reg1);
   input CLK, RST, HALT;
+  reg RSTreg, HALTreg;
   output reg CS, WE;
   output [6:0] ADDR;
   output[7:0] reg1;
@@ -328,11 +334,12 @@ module MIPS (CLK, RST, HALT, CS, WE, ADDR, Mem_Bus, reg1);
   end //always
 
   always @(posedge CLK) begin
-
-    if (RST) begin
+    RSTreg <= RST;
+    HALTreg <= HALT;
+    if (RSTreg) begin
       state <= 3'd0;
       pc <= 7'd0;
-    end else if(HALT) begin 
+    end else if(HALTreg) begin 
       //No updates - pause the system
     end
     else begin

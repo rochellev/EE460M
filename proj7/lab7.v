@@ -123,7 +123,8 @@ module Memory(CS, WE, CLK, ADDR, Mem_Bus);
 
   initial
   begin
-    $readmemh("c:/Users/Neeks/Desktop/EE460M/proj7/rot_led.hex", RAM);
+    //$readmemh("c:/Users/Neeks/Desktop/EE460M/proj7/rot_led.hex", RAM);
+    $readmemh("c:/Users/Rochelle Roberts/Documents/_EE460M Repo/EE460M/proj7/rot_led.hex", RAM);
   end
 
   assign Mem_Bus = ((CS == 1'b0) || (WE == 1'b1)) ? 32'bZ : data_out;

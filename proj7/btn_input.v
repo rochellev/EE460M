@@ -26,7 +26,7 @@ module d_ff(clk, d, q);
   input clk, d;
   output reg q;
 
-  always @(negedge clk) begin
+  always @(posedge clk) begin
     q <= d;
   end
 endmodule
